@@ -1,24 +1,27 @@
 package ru.zilzilok.avid.profile.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.zilzilok.avid.profile.services.MyUserDetailsService;
+import ru.zilzilok.avid.profile.services.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    final MyUserDetailsService userDetailsService;
+
+    private final UserService userDetailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SecurityConfiguration(MyUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public SecurityConfiguration(UserService userDetailService,
+                                 PasswordEncoder passwordEncoder) {
+        this.userDetailService = userDetailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -28,18 +31,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers("/registration").not().fullyAuthenticated()
                     .antMatchers("/admin/**").hasRole("ADMIN")
-                    .antMatchers("/").permitAll()
+                    .antMatchers("/", "/registration").permitAll()
                     .anyRequest().authenticated()
-                .and().sessionManagement().disable();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+                .and()
+                    .httpBasic()
+                .and()
+                    .rememberMe()
+                .and()
+                    .logout().logoutSuccessUrl("/").permitAll();
     }
 
     @Override
-    public void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.userDetailsService(userDetailsService);
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder);
+    }
+
+    @Override
+    protected UserDetailsService userDetailsService() {
+        return userDetailService;
     }
 }

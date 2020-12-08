@@ -14,7 +14,7 @@ public class RoleService {
         this.roleRepo = roleRepo;
     }
 
-    public Role getRole(String name) {
+    public Role getOrCreate(String name) {
         Role res = roleRepo.findByName(name);
         if(res == null) {
             res = roleRepo.save(new Role(name));
