@@ -1,6 +1,6 @@
-package ru.zilzilok.avid.profile.annotations.validators;
+package ru.zilzilok.avid.profile.models.annotations.validators;
 
-import ru.zilzilok.avid.profile.annotations.PasswordMatches;
+import ru.zilzilok.avid.profile.models.annotations.PasswordMatches;
 import ru.zilzilok.avid.profile.models.dto.UserRegDto;
 
 import javax.validation.ConstraintValidator;

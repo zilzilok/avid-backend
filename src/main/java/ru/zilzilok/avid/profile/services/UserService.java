@@ -6,21 +6,30 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import ru.zilzilok.avid.profile.models.dto.UserRegDto;
 import ru.zilzilok.avid.profile.models.entities.User;
 import ru.zilzilok.avid.profile.repositories.UserRepository;
+
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+    private final MailSender mailSender;
 
     @Autowired
-    public UserService(UserRepository userRepo, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepo,
+            RoleService roleService,
+            PasswordEncoder passwordEncoder,
+            MailSender mailSender) {
         this.userRepo = userRepo;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
+        this.mailSender = mailSender;
     }
 
     @Override
@@ -42,10 +51,31 @@ public class UserService implements UserDetailsService {
                     .role(roleService.getOrCreate("ROLE_USER"))
                     .role(roleService.getOrCreate("ROLE_ADMIN"))
                     .active(false)
+                    .activationCode(UUID.randomUUID().toString())
                     .build();
 
-            return userRepo.save(user);
+            userRepo.save(user);
+
+            if (!ObjectUtils.isEmpty(email)) {
+                String message = String.format("Привет, %s!\n" +
+                                "Добро пожаловать в Avid. Для активации зайдите на: http://localhost:8080/activate/%s",
+                        user.getUsername(),
+                        user.getActivationCode()
+                );
+                mailSender.send(email, "Код активации", message);
+            }
+            return user;
         }
         return null;
+    }
+
+    public boolean activateUser(User user) {
+        if (user == null) {
+            return false;
+        }
+
+        user.setActivationCode(null);
+        userRepo.save(user);
+        return true;
     }
 }

@@ -31,7 +31,9 @@ public class User implements UserDetails {
     private Date birthdate;
     private String country;
     private String photoPath;
+
     private boolean active;
+    private String activationCode;
 
     @Enumerated(EnumType.STRING)
     @EqualsAndHashCode.Exclude
