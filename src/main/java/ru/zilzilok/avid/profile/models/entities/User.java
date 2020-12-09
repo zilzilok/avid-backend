@@ -23,8 +23,10 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(unique = true)
     private String username;
     private String password;
+    @Column(unique = true)
     private String email;
     private String firstName;
     private String secondName;
@@ -33,6 +35,7 @@ public class User implements UserDetails {
     private String photoPath;
 
     private boolean active;
+    @JsonIgnore
     private String activationCode;
 
     @Enumerated(EnumType.STRING)

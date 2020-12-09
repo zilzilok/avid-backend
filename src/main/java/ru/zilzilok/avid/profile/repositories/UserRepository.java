@@ -7,6 +7,6 @@ import ru.zilzilok.avid.profile.models.entities.User;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
     User findByUsername(String username);
-
+    User findByEmail(String email);
     User findByActivationCode(String code);
 }

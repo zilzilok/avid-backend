@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import ru.zilzilok.avid.profile.models.dto.UserRegDto;
 import ru.zilzilok.avid.profile.models.entities.User;
@@ -14,6 +16,7 @@ import ru.zilzilok.avid.profile.repositories.UserRepository;
 import java.util.UUID;
 
 @Service
+@EnableTransactionManagement
 public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
     private final RoleService roleService;
@@ -42,31 +45,38 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    @Transactional
     public User registerNewUserAccount(UserRegDto userRegDto) {
-        if (userRepo.findByUsername(userRegDto.getUsername()) == null) {
-            String username = userRegDto.getUsername();
+        String username = userRegDto.getUsername();
+        String email = userRegDto.getEmail();
+        if (userRepo.findByUsername(username) == null && userRepo.findByEmail(email) == null) {
             String password = passwordEncoder.encode(userRegDto.getPassword());
-            String email = userRegDto.getEmail();
             User user = User.builder(username, password, email)
                     .role(roleService.getOrCreate("ROLE_USER"))
                     .role(roleService.getOrCreate("ROLE_ADMIN"))
                     .active(false)
-                    .activationCode(UUID.randomUUID().toString())
                     .build();
 
-            userRepo.save(user);
+            user.setActivationCode(UUID.randomUUID().toString());
+            sendActivationMail(user);
 
-            if (!ObjectUtils.isEmpty(email)) {
-                String message = String.format("Привет, %s!\n" +
-                                "Добро пожаловать в Avid. Для активации зайдите на: http://localhost:8080/activate/%s",
-                        user.getUsername(),
-                        user.getActivationCode()
-                );
-                mailSender.send(email, "Код активации", message);
-            }
-            return user;
+            return userRepo.save(user);
         }
         return null;
+    }
+
+    @Transactional
+    public void sendActivationMail(User user) {
+        String email = user.getEmail();
+        if (!ObjectUtils.isEmpty(email)) {
+            String message = String.format("Привет, %s!\n" +
+                            "Добро пожаловать в Avid.\n" +
+                            "Для активации зайдите на: http://localhost:8080/registration/activate/%s",
+                    user.getUsername(),
+                    user.getActivationCode()
+            );
+            mailSender.send(email, "Код активации", message);
+        }
     }
 
     public boolean activateUser(User user) {
@@ -74,6 +84,7 @@ public class UserService implements UserDetailsService {
             return false;
         }
 
+        user.setActive(true);
         user.setActivationCode(null);
         userRepo.save(user);
         return true;
