@@ -12,6 +12,7 @@ import ru.zilzilok.avid.profile.services.UserService;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,7 +32,6 @@ public class UserController {
     public ResponseEntity<Set<User>> getUsers(Principal principal) {
         return ResponseEntity.ok(Collections.singleton(userRepo.findByUsername(principal.getName())));
     }
-
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateUser(Principal p) {
@@ -54,5 +54,33 @@ public class UserController {
         user.setPhotoPath(userInfoDto.getPhotoPath());
         user.setGender(userInfoDto.getGender());
         return ResponseEntity.ok(userRepo.save(user));
+    }
+
+    @GetMapping("/addfriend/{id}")
+    public ResponseEntity<String> addFriend(@PathVariable("id") Long id, Principal p) {
+        User user = userRepo.findByUsername(p.getName());
+        Optional<User> friend = userRepo.findById(id);
+        if(friend.isPresent()) {
+            if(!user.getId().equals(id)) {
+                user.getFriends().add(friend.get());
+                return ResponseEntity.ok(String.format("The friend with id = %d added.", id));
+            }
+            return ResponseEntity.badRequest().body("User can't add yourself to friends list.");
+        }
+        return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
+    }
+
+    @GetMapping("/addfriend/{username}")
+    public ResponseEntity<String> addFriend(@PathVariable("username") String username, Principal p) {
+        User user = userRepo.findByUsername(p.getName());
+        User friend = userRepo.findByUsername(username);
+        if(friend != null) {
+            if(!user.getUsername().equals(username)) {
+                user.getFriends().add(friend);
+                return ResponseEntity.ok(String.format("The friend with username = %s added successfully.", username));
+            }
+            return ResponseEntity.badRequest().body("User can't add yourself to friends list.");
+        }
+        return ResponseEntity.badRequest().body(String.format("User with username = %s doesn't exist.", username));
     }
 }

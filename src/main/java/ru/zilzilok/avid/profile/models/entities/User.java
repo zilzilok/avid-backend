@@ -55,6 +55,19 @@ public class User implements UserDetails {
     @EqualsAndHashCode.Exclude
     private Set<Role> roles;
 
+    @ManyToMany(
+            targetEntity = User.class,
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    @JsonIgnore
+    @Singular
+    @EqualsAndHashCode.Exclude
+    private Set<User> friends;
+
     public static UserBuilder builder(String username, String password, String email) {
         return hiddenBuilder()
                 .username(username)
