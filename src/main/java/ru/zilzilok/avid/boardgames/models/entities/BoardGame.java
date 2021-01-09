@@ -1,6 +1,7 @@
 package ru.zilzilok.avid.boardgames.models.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "board_games")
 public class BoardGame {
 
@@ -18,9 +20,11 @@ public class BoardGame {
     private Long id;
 
     @Column(unique = true)
-    private String name;
+    private String title;
 
     private String description;
-    private String creatorName;
+    private String descriptionShort;
+    private String publisherName;
     private String photoPath;
+    private int year;
 }
