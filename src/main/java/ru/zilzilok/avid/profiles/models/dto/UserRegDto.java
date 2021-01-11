@@ -1,15 +1,17 @@
 package ru.zilzilok.avid.profiles.models.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.zilzilok.avid.profiles.models.annotations.PasswordMatches;
+import ru.zilzilok.avid.profiles.models.annotations.ValidEmail;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @PasswordMatches
 public class UserRegDto {
     @NotNull(message = "username can't be null")
@@ -26,6 +28,6 @@ public class UserRegDto {
 
     @NotNull(message = "email can't be null")
     @NotEmpty(message = "email can't be empty")
-    @Email
+    @ValidEmail
     private String email;
 }

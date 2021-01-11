@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
-import ru.zilzilok.avid.profiles.repositories.UserRepository;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import javax.validation.Valid;

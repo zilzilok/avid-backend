@@ -5,6 +5,7 @@ import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Objects;
 
 public class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, Object> {
 
@@ -14,9 +15,9 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
 
     @Override
     public boolean isValid(Object obj, ConstraintValidatorContext context) {
-        if(obj instanceof UserRegDto) {
+        if (obj instanceof UserRegDto) {
             UserRegDto userRegDto = (UserRegDto) obj;
-            return userRegDto.getPassword().equals(userRegDto.getMatchingPassword());
+            return Objects.equals(userRegDto.getPassword(), userRegDto.getMatchingPassword());
         }
         return false;
     }

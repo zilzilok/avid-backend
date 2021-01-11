@@ -27,15 +27,9 @@ import java.util.Objects;
 @Service
 public class TeseraApiService {
 
-    private static final String URL = "https://api.tesera.ru";
     private static final Type BOARD_GAME_DTO_TYPE = new TypeToken<ArrayList<BoardGameDto>>(){}.getType();
     private final WebClient webClient;
     private final Gson gson = new Gson();
-
-    @Bean
-    public WebClient webClient() {
-        return WebClient.create(URL);
-    }
 
     @Autowired
     public TeseraApiService(WebClient webClient) {
