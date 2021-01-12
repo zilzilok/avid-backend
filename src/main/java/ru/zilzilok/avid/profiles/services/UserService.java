@@ -1,6 +1,7 @@
 package ru.zilzilok.avid.profiles.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,9 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MailSender mailSender;
 
+    @Value("${hostname}")
+    private String hostname;
+
     @Autowired
     public UserService(
             UserRepository userRepo,
@@ -38,6 +42,16 @@ public class UserService implements UserDetailsService {
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Username not found.");
+        }
+
+        return user;
     }
 
     @Transactional
@@ -67,16 +81,6 @@ public class UserService implements UserDetailsService {
         return userRepo.findAll(pageable).getContent();
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Username not found.");
-        }
-
-        return user;
-    }
-
     @Transactional
     public User registerNewUserAccount(UserRegDto userRegDto) {
         String username = userRegDto.getUsername();
@@ -89,7 +93,7 @@ public class UserService implements UserDetailsService {
                     .build();
 
             user.setActivationCode(UUID.randomUUID().toString());
-//            sendActivationMail(user);
+            sendActivationMail(user);
 
             return userRepo.save(user);
         }
@@ -112,8 +116,9 @@ public class UserService implements UserDetailsService {
         if (!ObjectUtils.isEmpty(email)) {
             String message = String.format("Привет, %s!\n" +
                             "Добро пожаловать в Avid.\n" +
-                            "Для активации зайдите на: http://localhost:8080/registration/activate/%s",
+                            "Для активации зайдите на: http://%s/registration/activate/%s",
                     user.getUsername(),
+                    hostname,
                     user.getActivationCode()
             );
             mailSender.send(email, "Код активации", message);

@@ -2,7 +2,7 @@ package ru.zilzilok.avid.profile;
 
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,8 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.result.StatusResultMatchers;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
+import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -29,6 +30,12 @@ public class RegistrationTests {
 
     @Autowired
     private MockMvc mockMvc;
+    private final UserService userService;
+
+    @Autowired
+    public RegistrationTests(UserService userService) {
+        this.userService = userService;
+    }
 
     private static Stream<Arguments> usersTestData() {
         return Stream.of(
@@ -89,6 +96,11 @@ public class RegistrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
                 .andExpect(status);
+
+        if (status == MockMvcResultMatchers.status().isOk()) {
+            User user = userService.findByUsername(username);
+            Assertions.assertNotNull(user);
+        }
     }
 
     @Test
@@ -104,6 +116,43 @@ public class RegistrationTests {
                 MockMvcRequestBuilders.post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void userActivationTest() throws Exception {
+        String username = UUID.randomUUID().toString();
+        String password = UUID.randomUUID().toString();
+        UserRegDto newUser = UserRegDto.builder()
+                .username(username)
+                .password(password)
+                .matchingPassword(password)
+                .email(String.format("%d@test.ru", System.currentTimeMillis())).build();
+
+        this.mockMvc.perform(
+                MockMvcRequestBuilders.post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(GSON_INSTANCE.toJson(newUser)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        User user = userService.findByUsername(username);
+        Assertions.assertNotNull(user);
+        Assertions.assertFalse(user.isActive());
+        Assertions.assertNotNull(user.getActivationCode());
+
+        String activationCode = user.getActivationCode();
+        this.mockMvc.perform(
+                MockMvcRequestBuilders.get(String.format("%s/activate/%s", URL, activationCode))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        user = userService.findByUsername(username);
+        Assertions.assertTrue(user.isActive());
+        Assertions.assertNull(user.getActivationCode());
+
+        this.mockMvc.perform(
+                MockMvcRequestBuilders.get(String.format("%s/activate/%s", URL, activationCode))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
