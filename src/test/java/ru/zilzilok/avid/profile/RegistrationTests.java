@@ -1,8 +1,8 @@
 package ru.zilzilok.avid.profile;
 
 import com.google.gson.Gson;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,6 +21,8 @@ import ru.zilzilok.avid.profiles.services.UserService;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static ru.zilzilok.avid.TestData.getRandomUsername;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class RegistrationTests {
@@ -28,19 +30,19 @@ public class RegistrationTests {
     private final static String URL = "/registration";
     private final static Gson GSON_INSTANCE = new Gson();
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
     private final UserService userService;
 
     @Autowired
-    public RegistrationTests(UserService userService) {
+    public RegistrationTests(UserService userService, MockMvc mockMvc) {
         this.userService = userService;
+        this.mockMvc = mockMvc;
     }
 
     private static Stream<Arguments> usersTestData() {
         return Stream.of(
                 /* Correct user */
-                Arguments.of(UUID.randomUUID().toString(),
+                Arguments.of(getRandomUsername(),
                         UUID.randomUUID().toString(),
                         String.format("%d@test.ru", System.currentTimeMillis()),
                         MockMvcResultMatchers.status().isOk()),
@@ -50,12 +52,12 @@ public class RegistrationTests {
                         String.format("%d@test.ru", System.currentTimeMillis()),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* null passwords */
-                Arguments.of(UUID.randomUUID().toString(),
+                Arguments.of(getRandomUsername(),
                         null,
                         String.format("%d@test.ru", System.currentTimeMillis()),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* null email */
-                Arguments.of(UUID.randomUUID().toString(),
+                Arguments.of(getRandomUsername(),
                         UUID.randomUUID().toString(),
                         null,
                         MockMvcResultMatchers.status().isBadRequest()),
@@ -65,17 +67,17 @@ public class RegistrationTests {
                         String.format("%d@test.ru", System.currentTimeMillis()),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* empty passwords */
-                Arguments.of(UUID.randomUUID().toString(),
+                Arguments.of(getRandomUsername(),
                         "",
                         String.format("%d@test.ru", System.currentTimeMillis()),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* empty email */
-                Arguments.of(UUID.randomUUID().toString(),
+                Arguments.of(getRandomUsername(),
                         UUID.randomUUID().toString(),
                         "",
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* invalid email */
-                Arguments.of(UUID.randomUUID().toString(),
+                Arguments.of(getRandomUsername(),
                         UUID.randomUUID().toString(),
                         "kekEmail",
                         MockMvcResultMatchers.status().isBadRequest())
@@ -107,7 +109,7 @@ public class RegistrationTests {
     public void passwordMismatchTest() throws Exception {
         String password = UUID.randomUUID().toString();
         UserRegDto newUser = UserRegDto.builder()
-                .username(UUID.randomUUID().toString())
+                .username(getRandomUsername())
                 .password(password)
                 .matchingPassword("")
                 .email(String.format("%d@test.ru", System.currentTimeMillis())).build();
@@ -121,7 +123,7 @@ public class RegistrationTests {
 
     @Test
     public void userActivationTest() throws Exception {
-        String username = UUID.randomUUID().toString();
+        String username = getRandomUsername();
         String password = UUID.randomUUID().toString();
         UserRegDto newUser = UserRegDto.builder()
                 .username(username)
