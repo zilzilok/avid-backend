@@ -66,18 +66,13 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public User save(User user) {
-        return userRepo.save(user);
-    }
-
-    @Transactional
     public User findByActivationCode(String code) {
         return userRepo.findByActivationCode(code);
     }
 
     @Transactional
     public Iterable<User> getAll(int limit, int offset, Sort sort) {
-        Pageable pageable = new OffsetBasedPageRequest(limit, offset, sort);
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
         return userRepo.findAll(pageable).getContent();
     }
 
@@ -108,6 +103,7 @@ public class UserService implements UserDetailsService {
         user.setCountry(userInfoDto.getCountry());
         user.setPhotoPath(userInfoDto.getPhotoPath());
         user.setGender(userInfoDto.getGender());
+        userRepo.save(user);
     }
 
     @Transactional

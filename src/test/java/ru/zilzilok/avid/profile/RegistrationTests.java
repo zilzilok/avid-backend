@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
@@ -21,7 +22,8 @@ import ru.zilzilok.avid.profiles.services.UserService;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static ru.zilzilok.avid.TestData.getRandomUsername;
+import static ru.zilzilok.avid.TestData.*;
+import static ru.zilzilok.avid.TestData.getPassword;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,43 +44,43 @@ public class RegistrationTests {
     private static Stream<Arguments> usersTestData() {
         return Stream.of(
                 /* Correct user */
-                Arguments.of(getRandomUsername(),
-                        UUID.randomUUID().toString(),
-                        String.format("%d@test.ru", System.currentTimeMillis()),
+                Arguments.of(getUsername(),
+                        getPassword(),
+                        getEmail(),
                         MockMvcResultMatchers.status().isOk()),
                 /* null username */
                 Arguments.of(null,
-                        UUID.randomUUID().toString(),
-                        String.format("%d@test.ru", System.currentTimeMillis()),
+                        getPassword(),
+                        getEmail(),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* null passwords */
-                Arguments.of(getRandomUsername(),
+                Arguments.of(getUsername(),
                         null,
-                        String.format("%d@test.ru", System.currentTimeMillis()),
+                        getEmail(),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* null email */
-                Arguments.of(getRandomUsername(),
-                        UUID.randomUUID().toString(),
+                Arguments.of(getUsername(),
+                        getPassword(),
                         null,
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* empty username */
                 Arguments.of("",
-                        UUID.randomUUID().toString(),
-                        String.format("%d@test.ru", System.currentTimeMillis()),
+                        getPassword(),
+                        getEmail(),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* empty passwords */
-                Arguments.of(getRandomUsername(),
+                Arguments.of(getUsername(),
                         "",
-                        String.format("%d@test.ru", System.currentTimeMillis()),
+                        getEmail(),
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* empty email */
-                Arguments.of(getRandomUsername(),
-                        UUID.randomUUID().toString(),
+                Arguments.of(getUsername(),
+                        getPassword(),
                         "",
                         MockMvcResultMatchers.status().isBadRequest()),
                 /* invalid email */
-                Arguments.of(getRandomUsername(),
-                        UUID.randomUUID().toString(),
+                Arguments.of(getUsername(),
+                        getPassword(),
                         "kekEmail",
                         MockMvcResultMatchers.status().isBadRequest())
         );
@@ -93,10 +95,11 @@ public class RegistrationTests {
                 .matchingPassword(password)
                 .email(email).build();
 
-        this.mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status);
 
         if (status == MockMvcResultMatchers.status().isOk()) {
@@ -107,14 +110,14 @@ public class RegistrationTests {
 
     @Test
     public void passwordMismatchTest() throws Exception {
-        String password = UUID.randomUUID().toString();
+        String password = getPassword();
         UserRegDto newUser = UserRegDto.builder()
-                .username(getRandomUsername())
+                .username(getUsername())
                 .password(password)
                 .matchingPassword("")
-                .email(String.format("%d@test.ru", System.currentTimeMillis())).build();
+                .email(getEmail()).build();
 
-        this.mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
@@ -123,15 +126,15 @@ public class RegistrationTests {
 
     @Test
     public void userActivationTest() throws Exception {
-        String username = getRandomUsername();
-        String password = UUID.randomUUID().toString();
+        String username = getUsername();
+        String password = getPassword();
         UserRegDto newUser = UserRegDto.builder()
                 .username(username)
                 .password(password)
                 .matchingPassword(password)
-                .email(String.format("%d@test.ru", System.currentTimeMillis())).build();
+                .email(getEmail()).build();
 
-        this.mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
@@ -143,8 +146,8 @@ public class RegistrationTests {
         Assertions.assertNotNull(user.getActivationCode());
 
         String activationCode = user.getActivationCode();
-        this.mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("%s/activate/%s", URL, activationCode))
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/activate/" + activationCode)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -152,8 +155,8 @@ public class RegistrationTests {
         Assertions.assertTrue(user.isActive());
         Assertions.assertNull(user.getActivationCode());
 
-        this.mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("%s/activate/%s", URL, activationCode))
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/activate/" + activationCode)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }

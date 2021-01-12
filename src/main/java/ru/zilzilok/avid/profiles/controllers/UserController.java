@@ -24,16 +24,21 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/all/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> getUsers(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    @GetMapping()
+    public ResponseEntity<User> getUsers(@RequestParam(name = "username", required = false) String username) {
+        return ResponseEntity.ok(userService.findByUsername(username));
+    }
+
     @GetMapping("/all")
-    public Iterable<User> getUsers(@RequestParam("limit") int limit,
-                                   @RequestParam("offset") int offset,
-                                   @RequestParam("sort") String sortType) {
-        if(limit < 0 || limit > 100) {
+    public Iterable<User> getUsers(@RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
+                                   @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+                                   @RequestParam(name = "sort", required = false) String sortType) {
+        if (limit < 1 || limit > 100) {
             limit = 10;
         }
         if (offset < 0) {
@@ -41,11 +46,10 @@ public class UserController {
         }
 
         Sort.Direction sortDirection = null;
-        if(!ObjectUtils.isEmpty(sortType)) {
-            if(sortType.equalsIgnoreCase("asc".trim())) {
+        if (!ObjectUtils.isEmpty(sortType)) {
+            if (sortType.equalsIgnoreCase("asc".trim())) {
                 sortDirection = Sort.Direction.ASC;
-            }
-            else if (sortType.equalsIgnoreCase("desc".trim())) {
+            } else if (sortType.equalsIgnoreCase("desc".trim())) {
                 sortDirection = Sort.Direction.DESC;
             }
         }
@@ -69,7 +73,7 @@ public class UserController {
     public ResponseEntity<User> updateUserInformation(@RequestBody @Valid UserInfoDto userInfoDto, Principal p) {
         User user = userService.findByUsername(p.getName());
         userService.updateInformation(user, userInfoDto);
-        return ResponseEntity.ok(userService.save(user));
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/friends/add/{id}")
@@ -86,8 +90,8 @@ public class UserController {
         return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
     }
 
-    @GetMapping("/friends/add/{username}")
-    public ResponseEntity<String> addFriend(@PathVariable("username") String username, Principal p) {
+    @GetMapping("/friends/add")
+    public ResponseEntity<String> addFriend(@RequestParam("username") String username, Principal p) {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findByUsername(username);
         if (friend != null) {
