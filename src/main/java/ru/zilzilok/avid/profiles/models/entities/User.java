@@ -2,7 +2,6 @@ package ru.zilzilok.avid.profiles.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +12,7 @@ import java.sql.Date;
 import java.util.Collection;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(builderMethodName = "hiddenBuilder")
@@ -55,6 +53,7 @@ public class User implements UserDetails {
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Role> roles;
 
     @ManyToMany(
@@ -68,6 +67,7 @@ public class User implements UserDetails {
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<User> friends;
 
     public void setFirstName(String firstName) {

@@ -1,6 +1,9 @@
 package ru.zilzilok.avid.profile;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.apache.commons.lang3.ObjectUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,7 +24,6 @@ import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
 import ru.zilzilok.avid.profiles.services.UserService;
 
-import java.sql.Date;
 import java.util.stream.Stream;
 
 import static ru.zilzilok.avid.profile.TestData.*;
@@ -31,11 +33,15 @@ import static ru.zilzilok.avid.profile.TestData.*;
 public class UserTests {
 
     private final static String URL = "/user";
-    private final static Gson GSON_INSTANCE = new Gson();
+    private final static Gson GSON_INSTANCE = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 
     private final MockMvc mockMvc;
     private final UserService userService;
     private User testUser;
+
+    private User getTestUser() {
+        return userService.findByUsername("test");
+    }
 
     @Autowired
     public UserTests(UserService userService, MockMvc mockMvc) {
@@ -137,32 +143,58 @@ public class UserTests {
 
     private static Stream<Arguments> updateInfoTestData() {
         return Stream.of(
-                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), getGender())
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), getGender()),
+                Arguments.of("", getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), getGender()),
+                Arguments.of(getFirstName(), "", getBirthdate(), getCountry(), getPhotoPath(), getGender()),
+                Arguments.of(getFirstName(), getSecondName(), "", getCountry(), getPhotoPath(), getGender()),
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), "", getPhotoPath(), getGender()),
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), "", getGender()),
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), ""),
+                Arguments.of("", "", "", "", "", ""),
+                Arguments.of(null, null, null, null, null, null)
         );
+    }
+
+    private static void assertEqualsOrNotEquals(Object oldValue, Object newValue) {
+        if (ObjectUtils.isNotEmpty(newValue)) {
+            Assertions.assertEquals(oldValue, newValue);
+        } else {
+            Assertions.assertNotEquals(oldValue, newValue);
+        }
+
     }
 
     @ParameterizedTest
     @MethodSource("updateInfoTestData")
     public void updateInfoTest(String firstName,
                                String secondName,
-                               Date birthdate,
+                               String birthdate,
                                String country,
                                String photoPath,
-                               Gender gender) throws Exception {
+                               String gender) throws Exception {
         UserInfoDto userInfo = UserInfoDto.builder()
                 .firstName(firstName)
                 .secondName(secondName)
                 .birthdate(birthdate)
                 .country(country)
                 .photoPath(photoPath)
-                .gender(gender).build();
+                .gender(Gender.fromString(gender)).build();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/update/info")
+                MockMvcRequestBuilders.post(URL + "/update/info")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(userInfo))
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        User user = getTestUser();
+
+        assertEqualsOrNotEquals(user.getSecondName(), secondName);
+        assertEqualsOrNotEquals(user.getSecondName(), secondName);
+        assertEqualsOrNotEquals(user.getBirthdate().toString(), birthdate);
+        assertEqualsOrNotEquals(user.getCountry(), country);
+        assertEqualsOrNotEquals(user.getPhotoPath(), photoPath);
+        assertEqualsOrNotEquals(user.getGender(), Gender.fromString(gender));
     }
 }

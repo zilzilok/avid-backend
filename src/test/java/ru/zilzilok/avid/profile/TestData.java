@@ -3,9 +3,10 @@ package ru.zilzilok.avid.profile;
 import org.apache.commons.lang3.RandomStringUtils;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TestData {
 
@@ -39,7 +40,6 @@ public class TestData {
     }
 
     /**
-     *
      * @return
      */
     public static String getFirstName() {
@@ -50,8 +50,8 @@ public class TestData {
         return RandomStringUtils.random(10, true, false);
     }
 
-    public static Date getBirthdate() {
-        return null;
+    public static String getBirthdate() {
+        return new Date(ThreadLocalRandom.current().nextInt() * 1000L).toString();
     }
 
     public static String getCountry() {
@@ -63,6 +63,6 @@ public class TestData {
     }
 
     public static String getGender() {
-        return RANDOM_INSTANCE.nextBoolean() ? Gender.FEMALE.toString() : Gender.MALE.toString();
+        return RANDOM_INSTANCE.nextBoolean() ? Gender.FEMALE.getName() : Gender.MALE.getName();
     }
 }
