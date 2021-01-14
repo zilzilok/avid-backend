@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -19,11 +18,9 @@ import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.services.UserService;
 
-import java.util.UUID;
 import java.util.stream.Stream;
 
-import static ru.zilzilok.avid.TestData.*;
-import static ru.zilzilok.avid.TestData.getPassword;
+import static ru.zilzilok.avid.profile.TestData.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,54 +38,51 @@ public class RegistrationTests {
         this.mockMvc = mockMvc;
     }
 
-    private static Stream<Arguments> usersTestData() {
+    @Test
+    public void newUserTest() throws Exception {
+        /* Correct user */
+        String password = getPassword();
+        String username = getUsername();
+
+        UserRegDto newUser = UserRegDto.builder()
+                .username(username)
+                .password(password)
+                .matchingPassword(password)
+                .email(getEmail()).build();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(GSON_INSTANCE.toJson(newUser)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        User user = userService.findByUsername(username);
+        Assertions.assertNotNull(user);
+    }
+
+    private static Stream<Arguments> invalidUsersTestData() {
         return Stream.of(
-                /* Correct user */
-                Arguments.of(getUsername(),
-                        getPassword(),
-                        getEmail(),
-                        MockMvcResultMatchers.status().isOk()),
                 /* null username */
-                Arguments.of(null,
-                        getPassword(),
-                        getEmail(),
-                        MockMvcResultMatchers.status().isBadRequest()),
+                Arguments.of(null, getPassword(), getEmail()),
                 /* null passwords */
-                Arguments.of(getUsername(),
-                        null,
-                        getEmail(),
-                        MockMvcResultMatchers.status().isBadRequest()),
+                Arguments.of(getUsername(), null, getEmail()),
                 /* null email */
-                Arguments.of(getUsername(),
-                        getPassword(),
-                        null,
-                        MockMvcResultMatchers.status().isBadRequest()),
+                Arguments.of(getUsername(), getPassword(), null),
                 /* empty username */
-                Arguments.of("",
-                        getPassword(),
-                        getEmail(),
-                        MockMvcResultMatchers.status().isBadRequest()),
+                Arguments.of("", getPassword(), getEmail()),
                 /* empty passwords */
-                Arguments.of(getUsername(),
-                        "",
-                        getEmail(),
-                        MockMvcResultMatchers.status().isBadRequest()),
+                Arguments.of(getUsername(), "", getEmail()),
                 /* empty email */
-                Arguments.of(getUsername(),
-                        getPassword(),
-                        "",
-                        MockMvcResultMatchers.status().isBadRequest()),
+                Arguments.of(getUsername(), getPassword(), ""),
                 /* invalid email */
-                Arguments.of(getUsername(),
-                        getPassword(),
-                        "kekEmail",
-                        MockMvcResultMatchers.status().isBadRequest())
+                Arguments.of(getUsername(), getPassword(), "kekEmail")
         );
     }
 
     @ParameterizedTest
-    @MethodSource("usersTestData")
-    public void newUserTest(String username, String password, String email, ResultMatcher status) throws Exception {
+    @MethodSource("invalidUsersTestData")
+    public void newUserBadRequestTest(String username, String password, String email) throws Exception {
         UserRegDto newUser = UserRegDto.builder()
                 .username(username)
                 .password(password)
@@ -100,12 +94,7 @@ public class RegistrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status);
-
-        if (status == MockMvcResultMatchers.status().isOk()) {
-            User user = userService.findByUsername(username);
-            Assertions.assertNotNull(user);
-        }
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test

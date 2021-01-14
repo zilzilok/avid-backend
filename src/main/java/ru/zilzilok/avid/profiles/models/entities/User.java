@@ -2,6 +2,8 @@ package ru.zilzilok.avid.profiles.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
@@ -67,6 +69,42 @@ public class User implements UserDetails {
     @Singular
     @EqualsAndHashCode.Exclude
     private Set<User> friends;
+
+    public void setFirstName(String firstName) {
+        if (StringUtils.isNotBlank(firstName)) {
+            this.firstName = firstName;
+        }
+    }
+
+    public void setSecondName(String secondName) {
+        if (StringUtils.isNotBlank(secondName)) {
+            this.secondName = secondName;
+        }
+    }
+
+    public void setBirthdate(Date birthdate) {
+        if (birthdate != null) {
+            this.birthdate = birthdate;
+        }
+    }
+
+    public void setCountry(String country) {
+        if (StringUtils.isNotBlank(country)) {
+            this.country = country;
+        }
+    }
+
+    public void setPhotoPath(String photoPath) {
+        if (StringUtils.isNotBlank(photoPath)) {
+            this.photoPath = photoPath;
+        }
+    }
+
+    public void setGender(Gender gender) {
+        if (gender != null) {
+            this.gender = gender;
+        }
+    }
 
     public static UserBuilder builder(String username, String password, String email) {
         return hiddenBuilder()

@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.profiles.services;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -109,7 +110,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void sendActivationMail(User user) {
         String email = user.getEmail();
-        if (!ObjectUtils.isEmpty(email)) {
+        if (StringUtils.isNotBlank(email)) {
             String message = String.format("Привет, %s!\n" +
                             "Добро пожаловать в Avid.\n" +
                             "Для активации зайдите на: http://%s/registration/activate/%s",

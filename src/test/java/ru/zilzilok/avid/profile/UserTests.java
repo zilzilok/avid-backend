@@ -15,12 +15,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.zilzilok.avid.TestData;
+import ru.zilzilok.avid.profiles.models.dto.UserInfoDto;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.profiles.models.enums.Gender;
 import ru.zilzilok.avid.profiles.services.UserService;
 
+import java.sql.Date;
 import java.util.stream.Stream;
+
+import static ru.zilzilok.avid.profile.TestData.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -83,21 +87,82 @@ public class UserTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-    private static Stream<Arguments> paramsTestData() {
+    private static Stream<Arguments> validParamsTestData() {
         return Stream.of(
-                Arguments.of(1, 0, null),
-                Arguments.of(101, 0, null)
+                Arguments.of("1", "0", ""),
+                Arguments.of("10", "0", ""),
+                Arguments.of("10", "0", "asc"),
+                Arguments.of("10", "0", "desc"),
+                Arguments.of("3", "2", ""),
+                Arguments.of("3", "2", "ASC"),
+                Arguments.of("3", "2", "DESC"),
+                Arguments.of("3", "1", "aSc"),
+                Arguments.of("3", "1", "AsC"),
+                Arguments.of("3", "1", "DeSc"),
+                Arguments.of("-1", "-1", "")
         );
     }
 
     @ParameterizedTest
-    @MethodSource("paramsTestData")
-    public void getAllWithParamsTest(int limit, int offset, String sort) throws Exception {
+    @MethodSource("validParamsTestData")
+    public void getAllWithParamsOkTest(String limit, String offset, String sort) throws Exception {
+        String content = mockMvc.perform(
+                MockMvcRequestBuilders.get(String.format("%s/all?limit=%s&offset=%s&sort=%s", URL, limit, offset, sort))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        System.out.println("count = " + GSON_INSTANCE.fromJson(content, User[].class).length);
+    }
+
+    private static Stream<Arguments> invalidParamsTestData() {
+        return Stream.of(
+                Arguments.of("kek", "0", ""),
+                Arguments.of("1", "kek", ""),
+                Arguments.of("kek", "kek", "")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidParamsTestData")
+    public void getAllWithParamsBadRequestTest(String limit, String offset, String sort) throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get(String.format("%s/all?limit=%s&offset=%s&sort=%s", URL, limit, offset, sort))
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    private static Stream<Arguments> updateInfoTestData() {
+        return Stream.of(
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), getGender())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateInfoTestData")
+    public void updateInfoTest(String firstName,
+                               String secondName,
+                               Date birthdate,
+                               String country,
+                               String photoPath,
+                               Gender gender) throws Exception {
+        UserInfoDto userInfo = UserInfoDto.builder()
+                .firstName(firstName)
+                .secondName(secondName)
+                .birthdate(birthdate)
+                .country(country)
+                .photoPath(photoPath)
+                .gender(gender).build();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/update/info")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(GSON_INSTANCE.toJson(userInfo))
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

@@ -23,8 +23,8 @@ public class MailSender {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
         mailMessage.setFrom(username);
-        mailMessage.setTo(emailTo);
-        mailMessage.setSubject(subject);
+        mailMessage.setTo(emailTo.trim());
+        mailMessage.setSubject(subject.trim());
         mailMessage.setText(message);
 
         mailSender.send(mailMessage);

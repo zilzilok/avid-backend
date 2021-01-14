@@ -2,7 +2,7 @@ package ru.zilzilok.avid.boardgames.services;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.dom4j.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +27,8 @@ import java.util.Objects;
 @Service
 public class TeseraApiService {
 
-    private static final Type BOARD_GAME_DTO_TYPE = new TypeToken<ArrayList<BoardGameDto>>(){}.getType();
+    private static final Type BOARD_GAME_DTO_TYPE = new TypeToken<ArrayList<BoardGameDto>>() {
+    }.getType();
     private final WebClient webClient;
     private final Gson gson = new Gson();
 
@@ -49,7 +50,7 @@ public class TeseraApiService {
                     .bodyToMono(String.class)
                     .block();
 
-            if (!ObjectUtils.isEmpty(response)) {
+            if (StringUtils.isNotEmpty(response)) {
                 games.addAll(Objects.requireNonNull(gson.fromJson(response, BOARD_GAME_DTO_TYPE)));
             } else {
                 dataExist = false;

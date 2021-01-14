@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.profiles.models.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.sql.Date;
 
 @Data
 @NoArgsConstructor
+@Builder
 public class UserInfoDto {
     private String firstName;
     private String secondName;

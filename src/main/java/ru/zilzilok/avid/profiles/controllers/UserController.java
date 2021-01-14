@@ -35,9 +35,9 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public Iterable<User> getUsers(@RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
-                                   @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-                                   @RequestParam(name = "sort", required = false) String sortType) {
+    public ResponseEntity<Iterable<User>> getUsers(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                   @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+                                   @RequestParam(value = "sort", required = false) String sortType) {
         if (limit < 1 || limit > 100) {
             limit = 10;
         }
@@ -54,8 +54,8 @@ public class UserController {
             }
         }
 
-        Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "id");
-        return userService.getAll(limit, offset, sort);
+        Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "username");
+        return ResponseEntity.ok(userService.getAll(limit, offset, sort));
     }
 
     @GetMapping("/activate")
