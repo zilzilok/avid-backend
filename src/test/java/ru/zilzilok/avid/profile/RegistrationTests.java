@@ -110,6 +110,7 @@ public class RegistrationTests {
                 MockMvcRequestBuilders.post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -127,6 +128,7 @@ public class RegistrationTests {
                 MockMvcRequestBuilders.post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(newUser)))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         User user = userService.findByUsername(username);
@@ -138,6 +140,7 @@ public class RegistrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.get(URL + "/activate/" + activationCode)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         user = userService.findByUsername(username);
@@ -147,6 +150,7 @@ public class RegistrationTests {
         mockMvc.perform(
                 MockMvcRequestBuilders.get(URL + "/activate/" + activationCode)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

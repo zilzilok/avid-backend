@@ -197,4 +197,65 @@ public class UserTests {
         assertEqualsOrNotEquals(user.getPhotoPath(), photoPath);
         assertEqualsOrNotEquals(user.getGender(), Gender.fromString(gender));
     }
+
+    @Test
+    public void friendsAdditionByIdTest() throws Exception {
+        /* add new random user */
+        String username = getUsername();
+        String password = getPassword();
+        UserRegDto newUser = UserRegDto.builder()
+                .username(username)
+                .password(password)
+                .matchingPassword(password)
+                .email(getEmail()).build();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/registration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(GSON_INSTANCE.toJson(newUser)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        User friend = userService.findByUsername(username);
+
+        /* add new user to friends of testUser */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/add/" + friend.getId())
+                        .content(GSON_INSTANCE.toJson(newUser))
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        /* "testUser can't add yourself to friends list" */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/add/" + testUser.getId())
+                        .content(GSON_INSTANCE.toJson(newUser))
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        friend = userService.findByUsername(username);
+        Assertions.assertFalse(friend.getFriends().contains(getTestUser()));
+        Assertions.assertTrue(getTestUser().getFriends().contains(friend));
+
+        /* add testUser to friends of new user */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/add/" + testUser.getId())
+                        .content(GSON_INSTANCE.toJson(newUser))
+                        .with(SecurityMockMvcRequestPostProcessors.user(friend.getUsername()).password(friend.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        /* "New user can't add yourself to friends list" */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/add/" + friend.getId())
+                        .content(GSON_INSTANCE.toJson(newUser))
+                        .with(SecurityMockMvcRequestPostProcessors.user(friend.getUsername()).password(friend.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        friend = userService.findByUsername(username);
+        Assertions.assertTrue(friend.getFriends().contains(getTestUser()));
+        Assertions.assertTrue(getTestUser().getFriends().contains(friend));
+    }
 }
