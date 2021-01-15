@@ -26,7 +26,7 @@ import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.util.stream.Stream;
 
-import static ru.zilzilok.avid.profile.TestData.*;
+import static ru.zilzilok.avid.profile.ProfileTestData.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,8 +55,8 @@ public class UserTests {
         if (testUser == null) {
             UserRegDto tmpUser = UserRegDto.builder()
                     .username("test")
-                    .password(TestData.getPassword())
-                    .email(TestData.getEmail())
+                    .password(ProfileTestData.getPassword())
+                    .email(ProfileTestData.getEmail())
                     .build();
             userService.registerNewUserAccount(tmpUser);
             testUser = userService.findByUsername("test");

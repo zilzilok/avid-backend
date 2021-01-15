@@ -36,8 +36,8 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<Iterable<User>> getUsers(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
-                                   @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
-                                   @RequestParam(value = "sort", required = false) String sortType) {
+                                                   @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+                                                   @RequestParam(value = "sort", required = false) String sortType) {
         if (limit < 1 || limit > 100) {
             limit = 10;
         }
@@ -81,9 +81,17 @@ public class UserController {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findById(id);
         if (friend != null) {
+            if (user.getFriends().contains(friend)) {
+                return ResponseEntity.badRequest()
+                        .body(String.format("%s already added user with id = %d.", p.getName(), id));
+            }
+
             if (!user.getId().equals(id)) {
                 user.getFriends().add(friend);
-                return ResponseEntity.ok(String.format("The friend with id = %d added successfully.", id));
+                if (friend.getFriends().contains(user)) {
+                    return ResponseEntity.ok(String.format("The friend with id = %d added successfully.", id));
+                }
+                return ResponseEntity.ok(String.format("Friend request with user with id = %d sent successfully.", id));
             }
             return ResponseEntity.badRequest().body("User can't add yourself to friends list.");
         }
@@ -95,9 +103,18 @@ public class UserController {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findByUsername(username);
         if (friend != null) {
+            if (user.getFriends().contains(friend)) {
+                return ResponseEntity.badRequest()
+                        .body(String.format("%s already added user with username = %s.", p.getName(), username));
+            }
+
             if (!user.getUsername().equals(username)) {
                 user.getFriends().add(friend);
-                return ResponseEntity.ok(String.format("The friend with username = %s added successfully.", username));
+                if (friend.getFriends().contains(user)) {
+                    return ResponseEntity.ok(String.format("The friend with username = %s added successfully.", username));
+                }
+                return ResponseEntity
+                        .ok(String.format("Friend request with user with username = %s sent successfully.", username));
             }
             return ResponseEntity.badRequest().body("User can't add yourself to friends list.");
         }
