@@ -16,7 +16,7 @@ public class ProfileTestData {
     private static final Random RANDOM_INSTANCE = new Random();
 
     /**
-     * Uses randomUUID from {@link UUID} and currentTimeMillis from {@link System}.
+     * Uses {@link UUID#randomUUID()} and {@link System#currentTimeMillis()}.
      *
      * @return unique random string
      */
@@ -25,16 +25,16 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses currentTimeMillis from {@link System}.
+     * Uses {@link System#currentTimeMillis()}.
      *
-     * @return unique random email
+     * @return unique random email (*@test.ru)
      */
     public static String getEmail() {
         return String.format("%d@test.ru", System.currentTimeMillis());
     }
 
     /**
-     * Uses randomUUID from {@link UUID}.
+     * Uses {@link UUID#randomUUID()}.
      *
      * @return random password
      */
@@ -43,7 +43,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses random from {@link RandomStringUtils}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean) random(int, boolean, boolean)} from {@link RandomStringUtils}.
      *
      * @return random first name with 10 symbols
      */
@@ -52,7 +52,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses random from {@link RandomStringUtils}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean) random(int, boolean, boolean)} from {@link RandomStringUtils}.
      *
      * @return random second name with 10 symbols
      */
@@ -61,7 +61,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses current().nextInt() from {@link ThreadLocalRandom}.
+     * Uses {@link ThreadLocalRandom#nextInt() nextInt()} from {@link ThreadLocalRandom}.
      *
      * @return random birthdate
      */
@@ -70,7 +70,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses random from {@link RandomStringUtils}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean) random(int, boolean, boolean)} from {@link RandomStringUtils}.
      *
      * @return random country with 8 symbols
      */
@@ -79,16 +79,16 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses random from {@link RandomStringUtils}.
+     * Uses {@link System#currentTimeMillis()}.
      *
-     * @return random second name with 10 symbols
+     * @return random photo path (photo/*)
      */
     public static String getPhotoPath() {
         return "photo/" + System.currentTimeMillis();
     }
 
     /**
-     * Uses random instance from {@link Random} for nextBoolean.
+     * Uses random instance for {@link Random#nextBoolean()}.
      *
      * @return random gender (MALE or FEMALE)
      */
