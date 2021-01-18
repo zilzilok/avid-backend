@@ -1,11 +1,9 @@
 package ru.zilzilok.avid.boardgames.models.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,12 +17,20 @@ public class BoardGame {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(unique = true)
-    private String title;
+    @ElementCollection
+    @Singular
+    @CollectionTable(name = "board_game_titles", joinColumns = @JoinColumn(name = "board_game_id"))
+    private List<String> titles;
 
+    @Column(unique = true)
+    private String alias;
     private String description;
     private String descriptionShort;
     private String publisherName;
     private String photoPath;
     private int year;
+    private int playersMin;
+    private int playersMax;
+    private int playersMinRecommend;
+    private int playersMaxRecommend;
 }

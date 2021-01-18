@@ -7,5 +7,5 @@ import ru.zilzilok.avid.profiles.models.entities.User;
 
 @Repository
 public interface GameRepository extends JpaRepository<BoardGame, Long> {
-    BoardGame findByTitle(String title);
+    BoardGame findByAlias(String alias);
 }

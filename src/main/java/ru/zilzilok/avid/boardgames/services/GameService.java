@@ -7,11 +7,10 @@ import org.springframework.stereotype.Service;
 import ru.zilzilok.avid.boardgames.models.dto.BoardGameDto;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.repositories.GameRepository;
-import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.boardgames.services.api.ApiService;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
 
 import javax.transaction.Transactional;
-import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +18,12 @@ import java.util.Optional;
 @Service
 public class GameService {
     private final GameRepository gameRepo;
-    private final TeseraApiService teseraApiService;
+    private final ApiService apiService;
 
     @Autowired
-    public GameService(GameRepository gameRepository, TeseraApiService teseraApiService) {
+    public GameService(GameRepository gameRepository, ApiService apiService) {
         this.gameRepo = gameRepository;
-        this.teseraApiService = teseraApiService;
+        this.apiService = apiService;
     }
 
     @Transactional
@@ -39,13 +38,23 @@ public class GameService {
     }
 
     @Transactional
+    public BoardGame findByAlias(String alias) {
+        return gameRepo.findByAlias(alias);
+    }
+
+    @Transactional
     public BoardGame add(BoardGameDto boardGameDto) {
         BoardGame game = BoardGame.builder()
-                .title(boardGameDto.getTitle())
+                .titles(boardGameDto.getTitles())
                 .description(boardGameDto.getDescription())
                 .descriptionShort(boardGameDto.getDescriptionShort())
                 .photoPath(boardGameDto.getPhotoUrl())
                 .year(boardGameDto.getYear())
+                .alias(boardGameDto.getAlias())
+                .playersMin(boardGameDto.getPlayersMin())
+                .playersMax(boardGameDto.getPlayersMax())
+                .playersMinRecommend(boardGameDto.getPlayersMinRecommend())
+                .playersMaxRecommend(boardGameDto.getPlayersMax())
                 .build();
 
         return gameRepo.save(game);
@@ -61,8 +70,8 @@ public class GameService {
     }
 
     @Transactional
-    public Iterable<BoardGame> addAllFromTesera() {
-        addAll(teseraApiService.getAllGames());
+    public Iterable<BoardGame> addAllFromApi() {
+        addAll(apiService.getAllGames());
         return getAll(10, 0);
     }
 

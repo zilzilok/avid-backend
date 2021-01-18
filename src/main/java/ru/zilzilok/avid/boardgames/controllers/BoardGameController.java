@@ -10,24 +10,29 @@ import ru.zilzilok.avid.boardgames.services.GameService;
 
 @RestController
 @RequestMapping("/games")
-public class GameController {
+public class BoardGameController {
 
     private final GameService gameService;
 
     @Autowired
-    public GameController(GameService gameService) {
+    public BoardGameController(GameService gameService) {
         this.gameService = gameService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardGame> getGames(@PathVariable("id") Long id) {
+    public ResponseEntity<BoardGame> getGame(@PathVariable("id") Long id) {
         return ResponseEntity.ok(gameService.findById(id));
     }
 
+    @GetMapping
+    public ResponseEntity<BoardGame> getGame(@RequestParam(value = "alias", required = false, defaultValue = "") String alias) {
+        return ResponseEntity.ok(gameService.findByAlias(alias));
+    }
+
     @GetMapping("/all")
-    public Iterable<BoardGame> getGames(@RequestParam("limit") int limit,
-                                        @RequestParam("offset") int offset,
-                                        @RequestParam("sort") String sortType) {
+    public ResponseEntity<Iterable<BoardGame>> getGames(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                                        @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+                                                        @RequestParam(value = "sort", required = false) String sortType) {
         if (limit < 0 || limit > 100) {
             limit = 10;
         }
@@ -44,7 +49,7 @@ public class GameController {
             }
         }
 
-        Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "id");
-        return gameService.getAll(limit, offset, sort);
+        Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "alias");
+        return ResponseEntity.ok(gameService.getAll(limit, offset, sort));
     }
 }

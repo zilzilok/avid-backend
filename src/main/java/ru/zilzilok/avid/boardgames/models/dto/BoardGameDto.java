@@ -1,13 +1,30 @@
 package ru.zilzilok.avid.boardgames.models.dto;
 
 import lombok.Data;
+import lombok.Setter;
 
-@Data
-public class BoardGameDto {
+import java.util.List;
 
-    private String description;
-    private String descriptionShort;
-    private String photoUrl;
-    private String title;
-    private int year;
+@Setter
+public abstract class BoardGameDto {
+
+    public abstract String getDescription();
+
+    public abstract String getDescriptionShort();
+
+    public abstract String getPhotoUrl();
+
+    public abstract List<String> getTitles();
+
+    public abstract String getAlias();
+
+    public abstract int getPlayersMin();
+
+    public abstract int getPlayersMax();
+
+    public abstract int getPlayersMinRecommend();
+
+    public abstract int getPlayersMaxRecommend();
+
+    public abstract int getYear();
 }
