@@ -1,10 +1,12 @@
 package ru.zilzilok.avid.boardgames.models.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Setter
@@ -42,7 +44,7 @@ public class TeseraBoardGameDto extends BoardGameDto {
 
     @Override
     public List<String> getTitles() {
-        return List.of(title, title2, title3);
+        return Arrays.asList(ArrayUtils.nullToEmpty(new String[]{title, title2, title2}));
     }
 
     @Override

@@ -54,7 +54,7 @@ public class GameService {
                 .playersMin(boardGameDto.getPlayersMin())
                 .playersMax(boardGameDto.getPlayersMax())
                 .playersMinRecommend(boardGameDto.getPlayersMinRecommend())
-                .playersMaxRecommend(boardGameDto.getPlayersMax())
+                .playersMaxRecommend(boardGameDto.getPlayersMaxRecommend())
                 .build();
 
         return gameRepo.save(game);

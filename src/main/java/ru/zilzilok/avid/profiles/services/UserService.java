@@ -85,6 +85,7 @@ public class UserService implements UserDetailsService {
             String password = passwordEncoder.encode(userRegDto.getPassword());
             User user = User.builder(username, password, email)
                     .role(roleService.getOrCreate("ROLE_USER"))
+                    .role(roleService.getOrCreate("ROLE_ADMIN"))
                     .active(false)
                     .build();
 

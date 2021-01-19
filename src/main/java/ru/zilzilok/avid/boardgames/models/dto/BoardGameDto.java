@@ -1,11 +1,7 @@
 package ru.zilzilok.avid.boardgames.models.dto;
 
-import lombok.Data;
-import lombok.Setter;
-
 import java.util.List;
 
-@Setter
 public abstract class BoardGameDto {
 
     public abstract String getDescription();

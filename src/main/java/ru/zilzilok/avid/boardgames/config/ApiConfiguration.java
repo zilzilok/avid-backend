@@ -2,6 +2,7 @@ package ru.zilzilok.avid.boardgames.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.zilzilok.avid.boardgames.services.api.ApiService;
 import ru.zilzilok.avid.boardgames.services.api.TeseraApiService;
@@ -13,7 +14,13 @@ public class ApiConfiguration {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.create(TESERA_API_URL);
+        return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024))
+                .build())
+                .baseUrl(TESERA_API_URL)
+                .build();
     }
 
     @Bean
