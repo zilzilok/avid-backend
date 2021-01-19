@@ -2,6 +2,7 @@ package ru.zilzilok.avid.сlubs.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 import ru.zilzilok.avid.profiles.models.entities.User;
 
 import javax.persistence.*;
@@ -23,7 +24,6 @@ public class Club {
     private String description;
     private String descriptionShort;
     private String photoUrl;
-    private String alias;
 
     @ManyToOne(targetEntity = User.class,
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
@@ -40,6 +40,30 @@ public class Club {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<User> members;
+
+    public void setName(String name) {
+        if (StringUtils.isNotBlank(name)) {
+            this.name = name;
+        }
+    }
+
+    public void setDescription(String description) {
+        if (StringUtils.isNotBlank(description)) {
+            this.description = description;
+        }
+    }
+
+    public void setDescriptionShort(String descriptionShort) {
+        if (StringUtils.isNotBlank(descriptionShort)) {
+            this.descriptionShort = descriptionShort;
+        }
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        if (StringUtils.isNotBlank(photoUrl)) {
+            this.photoUrl = photoUrl;
+        }
+    }
 
     public static Club.ClubBuilder builder(String name) {
         return hiddenBuilder()

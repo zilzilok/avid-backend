@@ -136,7 +136,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void joinClub(User user, Club club) {
-        user.getClubs().add(club);
+    public void addFriend(User user, User friend) {
+        user.getFriends().add(friend);
     }
 }

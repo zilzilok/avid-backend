@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
 import ru.zilzilok.avid.сlubs.models.dto.ClubDto;
+import ru.zilzilok.avid.сlubs.models.dto.ClubInfoDto;
 import ru.zilzilok.avid.сlubs.models.entities.Club;
 import ru.zilzilok.avid.сlubs.repositories.ClubRepository;
 
@@ -44,6 +45,7 @@ public class ClubService {
         return clubRepo.findAll(pageable).getContent();
     }
 
+    @Transactional
     public Club createNewClub(ClubDto clubDto, User creator) {
         Club club = Club.builder(clubDto.getName())
                 .description(clubDto.getDescription())
@@ -53,5 +55,23 @@ public class ClubService {
                 .member(creator)
                 .build();
         return clubRepo.save(club);
+    }
+
+    @Transactional
+    public void joinClub(Club club, User user) {
+        user.getClubs().add(club);
+    }
+
+    @Transactional
+    public void leaveClub(Club club, User user) {
+        user.getClubs().remove(club);
+    }
+
+    @Transactional
+    public void updateInfo(Club club, ClubInfoDto clubInfoDto) {
+        club.setName(clubInfoDto.getName());
+        club.setDescription(clubInfoDto.getDescription());
+        club.setDescriptionShort(clubInfoDto.getDescriptionShort());
+        club.setPhotoUrl(clubInfoDto.getPhotoUrl());
     }
 }

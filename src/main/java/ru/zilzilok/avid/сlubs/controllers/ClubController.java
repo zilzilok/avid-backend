@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.services.UserService;
 import ru.zilzilok.avid.сlubs.models.dto.ClubDto;
+import ru.zilzilok.avid.сlubs.models.dto.ClubInfoDto;
 import ru.zilzilok.avid.сlubs.models.entities.Club;
 import ru.zilzilok.avid.сlubs.services.ClubService;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/clubs")
@@ -28,7 +30,7 @@ public class ClubController {
         this.userService = userService;
     }
 
-    @PostMapping(name = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createClub(@RequestBody @Valid ClubDto clubDto, Principal p) {
         Club club = clubService.findByName(clubDto.getName());
         if (club == null) {
@@ -76,12 +78,55 @@ public class ClubController {
         Club club = clubService.findById(id);
         User user = userService.findByUsername(p.getName());
         if (club != null) {
-            if (user.getClubs().contains(club)) {
-                return ResponseEntity.badRequest().body(String.format("User %s already joined the club with id = %d", user.getUsername(), club.getId()));
+            if (Objects.equals(club.getCreator(), user)) {
+                return ResponseEntity.badRequest().body(String.format("User %s already joined to own club with id = %d.",
+                        user.getUsername(), club.getId()));
             }
-            userService.joinClub(user, club);
-            return ResponseEntity.ok(String.format("User %s joined to club with id = %d successfully.", user.getUsername(), club.getId()));
+
+            if (!user.getClubs().contains(club)) {
+                clubService.joinClub(club, user);
+                return ResponseEntity.ok(String.format("User %s joined to club with id = %d successfully.",
+                        user.getUsername(), club.getId()));
+            }
+            return ResponseEntity.badRequest().body(String.format("User %s already joined to the club with id = %d.",
+                    user.getUsername(), club.getId()));
         }
-        return ResponseEntity.badRequest().body(String.format("User with id = %d not found.", id));
+        return ResponseEntity.badRequest().body(String.format("Club with id = %d not found.", id));
+    }
+
+    @GetMapping("/{id}/leave")
+    public ResponseEntity<?> leaveClub(@PathVariable("id") Long id, Principal p) {
+        Club club = clubService.findById(id);
+        User user = userService.findByUsername(p.getName());
+        if (club != null) {
+            if (Objects.equals(club.getCreator(), user)) {
+                return ResponseEntity.badRequest().body(String.format("User %s can't leave own club with id = %d.",
+                        user.getUsername(), club.getId()));
+            }
+
+            if (user.getClubs().contains(club)) {
+                clubService.leaveClub(club, user);
+                return ResponseEntity.ok(String.format("User %s left to club with id = %d successfully.",
+                        user.getUsername(), club.getId()));
+            }
+            return ResponseEntity.badRequest().body(String.format("User %s can't leave club with id = %d.",
+                    user.getUsername(), club.getId()));
+        }
+        return ResponseEntity.badRequest().body(String.format("Club with id = %d not found.", id));
+    }
+
+    @PostMapping(value = "/{id}/update/info", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateClubInfo(@PathVariable("id") Long id, @RequestBody ClubInfoDto clubInfoDto, Principal p) {
+        Club club = clubService.findById(id);
+        User user = userService.findByUsername(p.getName());
+        if (club != null) {
+            if (!Objects.equals(club.getCreator(), user)) {
+                return ResponseEntity.badRequest().body(String.format("User %s can't update info of club with id = %d.",
+                        user.getUsername(), club.getId()));
+            }
+            clubService.updateInfo(club, clubInfoDto);
+            return ResponseEntity.ok(String.format("Info of club with id = %d updated successfully.", club.getId()));
+        }
+        return ResponseEntity.badRequest().body(String.format("Club with id = %d not found.", id));
     }
 }

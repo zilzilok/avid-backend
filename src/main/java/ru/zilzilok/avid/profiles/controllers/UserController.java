@@ -87,7 +87,7 @@ public class UserController {
             }
 
             if (!user.getId().equals(id)) {
-                user.getFriends().add(friend);
+                userService.addFriend(user, friend);
                 if (friend.getFriends().contains(user)) {
                     return ResponseEntity.ok(String.format("The friend with id = %d added successfully.", id));
                 }
@@ -109,7 +109,7 @@ public class UserController {
             }
 
             if (!user.getUsername().equals(username)) {
-                user.getFriends().add(friend);
+                userService.addFriend(user, friend);
                 if (friend.getFriends().contains(user)) {
                     return ResponseEntity.ok(String.format("The friend with username = %s added successfully.", username));
                 }
