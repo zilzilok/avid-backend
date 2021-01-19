@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
+import ru.zilzilok.avid.сlubs.models.entities.Club;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -45,11 +46,13 @@ public class User implements UserDetails {
     @ManyToMany(
             targetEntity = Role.class,
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
+            fetch = FetchType.EAGER
+    )
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
@@ -59,16 +62,46 @@ public class User implements UserDetails {
     @ManyToMany(
             targetEntity = User.class,
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
+            fetch = FetchType.EAGER
+    )
     @JoinTable(
             name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<User> friends;
+
+    @ManyToMany(
+            targetEntity = Club.class,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER
+    )
+    @JoinTable(
+            name = "user_clubs",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "club_id")
+    )
+    @JsonIgnore
+    @Singular
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Club> clubs;
+
+    @OneToMany(
+            targetEntity = Club.class,
+            cascade = CascadeType.ALL,
+            mappedBy = "creator",
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    @Singular
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Club> ownClubs;
 
     public void setFirstName(String firstName) {
         if (StringUtils.isNotBlank(firstName)) {

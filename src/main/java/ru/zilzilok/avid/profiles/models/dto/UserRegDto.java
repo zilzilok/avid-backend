@@ -7,8 +7,7 @@ import ru.zilzilok.avid.profiles.models.annotations.ValidEmail;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

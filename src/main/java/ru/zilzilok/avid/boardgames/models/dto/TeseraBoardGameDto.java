@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class TeseraBoardGameDto extends BoardGameDto {
 
     @Override
     public List<String> getTitles() {
-        return Arrays.asList(ArrayUtils.nullToEmpty(new String[]{title, title2, title2}));
+        return Arrays.asList(ArrayUtils.nullToEmpty(new String[]{title, title2, title3}));
     }
 
     @Override

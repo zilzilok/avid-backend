@@ -48,7 +48,7 @@ public class GameService {
                 .titles(boardGameDto.getTitles())
                 .description(boardGameDto.getDescription())
                 .descriptionShort(boardGameDto.getDescriptionShort())
-                .photoPath(boardGameDto.getPhotoUrl())
+                .photoUrl(boardGameDto.getPhotoUrl())
                 .year(boardGameDto.getYear())
                 .alias(boardGameDto.getAlias())
                 .playersMin(boardGameDto.getPlayersMin())

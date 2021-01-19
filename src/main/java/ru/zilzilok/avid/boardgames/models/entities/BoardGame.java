@@ -27,7 +27,7 @@ public class BoardGame {
     private String description;
     private String descriptionShort;
     private String publisherName;
-    private String photoPath;
+    private String photoUrl;
     private int year;
     private int playersMin;
     private int playersMax;

@@ -18,6 +18,7 @@ import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.repositories.UserRepository;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
+import ru.zilzilok.avid.сlubs.models.entities.Club;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -85,7 +86,6 @@ public class UserService implements UserDetailsService {
             String password = passwordEncoder.encode(userRegDto.getPassword());
             User user = User.builder(username, password, email)
                     .role(roleService.getOrCreate("ROLE_USER"))
-                    .role(roleService.getOrCreate("ROLE_ADMIN"))
                     .active(false)
                     .build();
 
@@ -133,5 +133,10 @@ public class UserService implements UserDetailsService {
         user.setActivationCode(null);
         userRepo.save(user);
         return true;
+    }
+
+    @Transactional
+    public void joinClub(User user, Club club) {
+        user.getClubs().add(club);
     }
 }
