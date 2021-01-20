@@ -3,6 +3,7 @@ package ru.zilzilok.avid.profiles.models.dto;
 import lombok.*;
 import ru.zilzilok.avid.profiles.models.annotations.PasswordMatches;
 import ru.zilzilok.avid.profiles.models.annotations.ValidEmail;
+import ru.zilzilok.avid.profiles.models.annotations.ValidUsername;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 public class UserRegDto {
     @NotNull(message = "username can't be null")
     @NotEmpty(message = "username can't be empty")
+    @ValidUsername
     private String username;
 
     @NotNull(message = "password can't be null")

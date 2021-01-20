@@ -76,11 +76,27 @@ public class RegistrationTests {
                 /* empty email */
                 Arguments.of(getUsername(), getPassword(), ""),
                 /* invalid email */
-                Arguments.of(getUsername(), getPassword(), "kekEmail")
+                Arguments.of(getUsername(), getPassword(), "kekEmail"),
+                /* invalid usernames */
+                Arguments.of("123", getPassword(), getEmail()),
+                Arguments.of("-asdasd-", getPassword(), getEmail()),
+                Arguments.of(".asdasd.", getPassword(), getEmail()),
+                Arguments.of("_asdasd_", getPassword(), getEmail()),
+                Arguments.of("asd#asd", getPassword(), getEmail()),
+                Arguments.of("asd$asd", getPassword(), getEmail()),
+                Arguments.of("asd@asd", getPassword(), getEmail()),
+                Arguments.of("asd..asd", getPassword(), getEmail()),
+                Arguments.of("asd--asd", getPassword(), getEmail()),
+                Arguments.of("asd__asd", getPassword(), getEmail()),
+                Arguments.of("asd._asd", getPassword(), getEmail()),
+                Arguments.of("asd.-asd", getPassword(), getEmail()),
+                Arguments.of("asd_-asd", getPassword(), getEmail()),
+                Arguments.of("", getPassword(), getEmail()),
+                Arguments.of(" ", getPassword(), getEmail())
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "#{index} - Run test with username = '{0}', password = '{1}', email = '{2}'")
     @MethodSource("invalidUsersTestData")
     public void newUserBadRequestTest(String username, String password, String email) throws Exception {
         UserRegDto newUser = UserRegDto.builder()
