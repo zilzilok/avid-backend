@@ -52,7 +52,6 @@ public class ClubService {
                 .descriptionShort(clubDto.getDescriptionShort())
                 .photoUrl(clubDto.getPhotoUrl())
                 .creator(creator)
-                .member(creator)
                 .build();
         return clubRepo.save(club);
     }
@@ -60,6 +59,7 @@ public class ClubService {
     @Transactional
     public void joinClub(Club club, User user) {
         user.getClubs().add(club);
+        clubRepo.save(club);
     }
 
     @Transactional

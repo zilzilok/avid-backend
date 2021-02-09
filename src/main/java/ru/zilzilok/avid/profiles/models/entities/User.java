@@ -45,7 +45,7 @@ public class User implements UserDetails {
 
     @ManyToMany(
             targetEntity = Role.class,
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             fetch = FetchType.EAGER
     )
     @JoinTable(
@@ -61,7 +61,7 @@ public class User implements UserDetails {
 
     @ManyToMany(
             targetEntity = User.class,
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             fetch = FetchType.EAGER
     )
     @JoinTable(
@@ -77,7 +77,7 @@ public class User implements UserDetails {
 
     @ManyToMany(
             targetEntity = Club.class,
-            cascade = {CascadeType.ALL},
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             fetch = FetchType.EAGER
     )
     @JoinTable(
@@ -95,7 +95,8 @@ public class User implements UserDetails {
             targetEntity = Club.class,
             cascade = CascadeType.ALL,
             mappedBy = "creator",
-            fetch = FetchType.LAZY
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     @JsonIgnore
     @Singular

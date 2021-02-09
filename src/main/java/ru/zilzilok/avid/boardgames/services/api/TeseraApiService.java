@@ -26,13 +26,14 @@ import java.util.Objects;
 @Service
 public class TeseraApiService implements ApiService {
 
-    private static final Gson gson = new Gson();
     private static final int LIMIT = 100;
     private final WebClient webClient;
+    private final Gson gson;
 
     @Autowired
-    public TeseraApiService(WebClient webClient) {
+    public TeseraApiService(WebClient webClient, Gson gson) {
         this.webClient = webClient;
+        this.gson = gson;
     }
 
     @Override

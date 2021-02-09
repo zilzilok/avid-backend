@@ -35,7 +35,9 @@ public class ClubController {
         Club club = clubService.findByName(clubDto.getName());
         if (club == null) {
             User creator = userService.findByUsername(p.getName());
-            return ResponseEntity.ok(clubService.createNewClub(clubDto, creator));
+            club = clubService.createNewClub(clubDto, creator);
+            clubService.joinClub(club, creator);
+            return ResponseEntity.ok(club);
         }
         return ResponseEntity.badRequest().body(String.format("Club with name = %s already exists.", clubDto.getName()));
     }

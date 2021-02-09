@@ -23,8 +23,11 @@ public class Role implements GrantedAuthority {
 
     private String name;
 
-    @ManyToMany(targetEntity = User.class, mappedBy = "roles",
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(
+            targetEntity = User.class,
+            mappedBy = "roles",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+            )
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<User> users;

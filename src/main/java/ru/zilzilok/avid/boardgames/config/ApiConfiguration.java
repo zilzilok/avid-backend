@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.boardgames.config;
 
+import com.google.gson.Gson;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -25,6 +26,11 @@ public class ApiConfiguration {
 
     @Bean
     public ApiService apiService() {
-        return new TeseraApiService(webClient());
+        return new TeseraApiService(webClient(), gson());
+    }
+
+    @Bean
+    public Gson gson() {
+        return new Gson();
     }
 }

@@ -58,8 +58,7 @@ public class UserTests {
                     .password(ProfileTestData.getPassword())
                     .email(ProfileTestData.getEmail())
                     .build();
-            userService.registerNewUserAccount(tmpUser);
-            testUser = userService.findByUsername("test");
+            testUser = userService.registerNewUserAccount(tmpUser);
         }
     }
 
@@ -143,13 +142,13 @@ public class UserTests {
 
     private static Stream<Arguments> updateInfoTestData() {
         return Stream.of(
-                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), getGender()),
-                Arguments.of("", getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), getGender()),
-                Arguments.of(getFirstName(), "", getBirthdate(), getCountry(), getPhotoPath(), getGender()),
-                Arguments.of(getFirstName(), getSecondName(), "", getCountry(), getPhotoPath(), getGender()),
-                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), "", getPhotoPath(), getGender()),
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoUrl(), getGender()),
+                Arguments.of("", getSecondName(), getBirthdate(), getCountry(), getPhotoUrl(), getGender()),
+                Arguments.of(getFirstName(), "", getBirthdate(), getCountry(), getPhotoUrl(), getGender()),
+                Arguments.of(getFirstName(), getSecondName(), "", getCountry(), getPhotoUrl(), getGender()),
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), "", getPhotoUrl(), getGender()),
                 Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), "", getGender()),
-                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoPath(), ""),
+                Arguments.of(getFirstName(), getSecondName(), getBirthdate(), getCountry(), getPhotoUrl(), ""),
                 Arguments.of("", "", "", "", "", ""),
                 Arguments.of(null, null, null, null, null, null)
         );

@@ -44,8 +44,7 @@ public class BoardGamesTests {
                     .password(ProfileTestData.getPassword())
                     .email(ProfileTestData.getEmail())
                     .build();
-            userService.registerNewUserAccount(tmpUser);
-            admin = userService.findByUsername("test");
+            admin = userService.registerNewUserAccount(tmpUser);
         }
     }
 

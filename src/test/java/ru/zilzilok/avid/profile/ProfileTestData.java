@@ -43,7 +43,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses {@link RandomStringUtils#random(int, boolean, boolean) random(int, boolean, boolean)} from {@link RandomStringUtils}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean)}.
      *
      * @return random first name with 10 symbols
      */
@@ -52,7 +52,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses {@link RandomStringUtils#random(int, boolean, boolean) random(int, boolean, boolean)} from {@link RandomStringUtils}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean)}.
      *
      * @return random second name with 10 symbols
      */
@@ -61,7 +61,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses {@link ThreadLocalRandom#nextInt() nextInt()} from {@link ThreadLocalRandom}.
+     * Uses {@link ThreadLocalRandom#nextInt()}.
      *
      * @return random birthdate
      */
@@ -70,7 +70,7 @@ public class ProfileTestData {
     }
 
     /**
-     * Uses {@link RandomStringUtils#random(int, boolean, boolean) random(int, boolean, boolean)} from {@link RandomStringUtils}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean)}.
      *
      * @return random country with 8 symbols
      */
@@ -81,9 +81,9 @@ public class ProfileTestData {
     /**
      * Uses {@link System#currentTimeMillis()}.
      *
-     * @return random photo path (photo/*)
+     * @return random photo URL (photo/*)
      */
-    public static String getPhotoPath() {
+    public static String getPhotoUrl() {
         return "photo/" + System.currentTimeMillis();
     }
 

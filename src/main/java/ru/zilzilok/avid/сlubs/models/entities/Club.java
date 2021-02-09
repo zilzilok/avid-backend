@@ -25,8 +25,7 @@ public class Club {
     private String descriptionShort;
     private String photoUrl;
 
-    @ManyToOne(targetEntity = User.class,
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "creator_id", nullable = false)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -34,7 +33,9 @@ public class Club {
 
     @ManyToMany(
             targetEntity = User.class, mappedBy = "clubs",
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
+            fetch = FetchType.EAGER
+    )
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
