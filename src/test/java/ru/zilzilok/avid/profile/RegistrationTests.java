@@ -96,7 +96,7 @@ public class RegistrationTests {
         );
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with username = '{0}', password = '{1}', email = '{2}'")
+    @ParameterizedTest(name = "#{index} - Run test with username =''{0}'', password =''{1}'', email =''{2}''")
     @MethodSource("invalidUsersTestData")
     public void newUserBadRequestTest(String username, String password, String email) throws Exception {
         UserRegDto newUser = UserRegDto.builder()

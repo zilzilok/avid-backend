@@ -149,7 +149,7 @@ public class ClubTests {
         );
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with limit = '{0}', offset = '{1}', sort = '{2}'")
+    @ParameterizedTest(name = "#{index} - Run test with limit =''{0}'', offset =''{1}'', sort =''{2}''")
     @MethodSource("validParamsTestData")
     public void getAllWithParamsOkTest(String limit, String offset, String sort) throws Exception {
         String content = mockMvc.perform(
@@ -170,7 +170,7 @@ public class ClubTests {
         );
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with limit = '{0}', offset = '{1}', sort = '{2}'")
+    @ParameterizedTest(name = "#{index} - Run test with limit =''{0}'', offset =''{1}'', sort =''{2}''")
     @MethodSource("invalidParamsTestData")
     public void getAllWithParamsBadRequestTest(String limit, String offset, String sort) throws Exception {
         mockMvc.perform(

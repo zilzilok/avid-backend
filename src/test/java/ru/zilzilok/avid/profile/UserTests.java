@@ -108,7 +108,7 @@ public class UserTests {
         );
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with limit = '{0}', offset = '{1}', sort = '{2}'")
+    @ParameterizedTest(name = "#{index} - Run test with limit =''{0}'', offset =''{1}'', sort =''{2}''")
     @MethodSource("validParamsTestData")
     public void getAllWithParamsOkTest(String limit, String offset, String sort) throws Exception {
         String content = mockMvc.perform(
@@ -129,7 +129,7 @@ public class UserTests {
         );
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with limit = '{0}', offset = '{1}', sort = '{2}'")
+    @ParameterizedTest(name = "#{index} - Run test with limit =''{0}'', offset =''{1}'', sort =''{2}''")
     @MethodSource("invalidParamsTestData")
     public void getAllWithParamsBadRequestTest(String limit, String offset, String sort) throws Exception {
         mockMvc.perform(
@@ -163,8 +163,8 @@ public class UserTests {
 
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with firstName = '{0}', secondName = '{1}', birthdate = '{2}'," +
-            " country = '{3}', photoPath = '{4}', gender = '{5}'")
+    @ParameterizedTest(name = "#{index} - Run test with firstName =''{0}'', secondName =''{1}'', birthdate =''{2}''," +
+            " country =''{3}'', photoPath =''{4}'', gender =''{5}''")
     @MethodSource("updateInfoTestData")
     public void updateInfoTest(String firstName,
                                String secondName,
