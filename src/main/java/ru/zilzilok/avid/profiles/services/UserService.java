@@ -12,13 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import ru.zilzilok.avid.profiles.models.dto.UserInfoDto;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.repositories.UserRepository;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
-import ru.zilzilok.avid.сlubs.models.entities.Club;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -70,6 +68,18 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User findByActivationCode(String code) {
         return userRepo.findByActivationCode(code);
+    }
+
+    @Transactional
+    public User findByUsernameAndPassword(String username, String password) {
+        User user = userRepo.findByUsername(username);
+        if (user != null && password != null) {
+            if(passwordEncoder.matches(password, user.getPassword())){
+                return user;
+            }
+            throw new UsernameNotFoundException("Wrong password.");
+        }
+        throw new UsernameNotFoundException("Username not found.");
     }
 
     @Transactional

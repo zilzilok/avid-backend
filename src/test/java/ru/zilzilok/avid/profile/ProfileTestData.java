@@ -16,12 +16,12 @@ public class ProfileTestData {
     private static final Random RANDOM_INSTANCE = new Random();
 
     /**
-     * Uses {@link UUID#randomUUID()} and {@link System#currentTimeMillis()}.
+     * Uses {@link RandomStringUtils#random(int, boolean, boolean)}.
      *
      * @return unique random string
      */
     public static String getUsername() {
-        return String.format("%s%s", UUID.randomUUID(), System.currentTimeMillis());
+        return RandomStringUtils.random(20, true, true);
     }
 
     /**
