@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.zilzilok.avid.profiles.config.jwt.JwtFilter;
+import ru.zilzilok.avid.profiles.config.auth.jwt.JwtFilter;
 
 @Configuration
 @EnableWebSecurity

@@ -1,4 +1,4 @@
-package ru.zilzilok.avid.profiles.config.jwt;
+package ru.zilzilok.avid.profiles.config.auth.jwt;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
