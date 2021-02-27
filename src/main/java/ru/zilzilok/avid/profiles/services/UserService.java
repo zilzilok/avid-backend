@@ -124,7 +124,7 @@ public class UserService implements UserDetailsService {
         if (StringUtils.isNotBlank(email)) {
             String message = String.format("Привет, %s!\n" +
                             "Добро пожаловать в Avid.\n" +
-                            "Для активации зайдите на: http://%s/registration/activate/%s",
+                            "Для активации зайдите на: %s/registration/activate/%s",
                     user.getUsername(),
                     hostname,
                     user.getActivationCode()
