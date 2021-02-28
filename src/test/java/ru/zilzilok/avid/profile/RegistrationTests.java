@@ -25,7 +25,6 @@ import static ru.zilzilok.avid.profile.ProfileTestData.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class RegistrationTests {
-
     private final static String URL = "/registration";
     private final static Gson GSON_INSTANCE = new Gson();
 
