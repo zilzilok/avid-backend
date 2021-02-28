@@ -66,6 +66,11 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    public User findByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
+
+    @Transactional
     public User findByActivationCode(String code) {
         return userRepo.findByActivationCode(code);
     }
@@ -74,7 +79,7 @@ public class UserService implements UserDetailsService {
     public User findByUsernameAndPassword(String username, String password) {
         User user = userRepo.findByUsername(username);
         if (user != null && password != null) {
-            if(passwordEncoder.matches(password, user.getPassword())){
+            if (passwordEncoder.matches(password, user.getPassword())) {
                 return user;
             }
             throw new UsernameNotFoundException("Wrong password.");
