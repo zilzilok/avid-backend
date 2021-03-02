@@ -46,7 +46,7 @@ public class ClubTests {
     }
 
     private Club getTestClub() {
-        return clubService.findByName("testCLub");
+        return clubService.findByName("testClub");
     }
 
     @Autowired
@@ -67,10 +67,10 @@ public class ClubTests {
                     .build();
             testUser = userService.registerNewUserAccount(tmpUser);
         }
-        testClub = clubService.findByName("testCLub");
+        testClub = clubService.findByName("testClub");
         if (testClub == null) {
             ClubDto tmpClub = ClubDto.builder()
-                    .name("testCLub")
+                    .name("testClub")
                     .description(getDescription())
                     .descriptionShort(getDescriptionShort())
                     .photoUrl(ClubTestData.getPhotoUrl())

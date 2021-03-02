@@ -117,7 +117,7 @@ public class ClubController {
         return ResponseEntity.badRequest().body(String.format("Club with id = %d not found.", id));
     }
 
-    @PostMapping(value = "/{id}/update/info", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/info/update", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateClubInfo(@PathVariable("id") Long id, @RequestBody ClubInfoDto clubInfoDto, Principal p) {
         Club club = clubService.findById(id);
         User user = userService.findByUsername(p.getName());

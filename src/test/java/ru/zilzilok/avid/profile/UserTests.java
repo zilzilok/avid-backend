@@ -181,7 +181,7 @@ public class UserTests {
                 .gender(Gender.fromString(gender)).build();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post(URL + "/update/info")
+                MockMvcRequestBuilders.post(URL + "/info/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(GSON_INSTANCE.toJson(userInfo))
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
