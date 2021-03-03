@@ -12,6 +12,7 @@ import ru.zilzilok.avid.boardgames.services.api.ApiService;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,7 +61,7 @@ public class GameService {
     }
 
     @Transactional
-    public void addAllGames(Iterable<BoardGameDto> boardGameDtoList) {
+    public void addAllGames(List<BoardGameDto> boardGameDtoList) {
         for (BoardGameDto game : boardGameDtoList) {
             addGame(game);
         }
@@ -70,6 +71,14 @@ public class GameService {
     public Iterable<BoardGame> addAllFromApi() {
         addAllGames(apiService.getAllGames());
         log.info("All games have been added.");
+        return getAllGames(10, 0);
+    }
+
+    @Transactional
+    public Iterable<BoardGame> addAllFromApi(boolean sortByBGGRate, int limit) {
+        List<BoardGameDto> boardGameDtoList = apiService.getAllGames(sortByBGGRate, limit);
+        addAllGames(boardGameDtoList);
+        log.info(boardGameDtoList.size() + " games have been added.");
         return getAllGames(10, 0);
     }
 

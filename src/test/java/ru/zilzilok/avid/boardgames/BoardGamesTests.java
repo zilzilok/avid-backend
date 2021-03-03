@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.boardgames;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +57,29 @@ public class BoardGamesTests {
                         .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void reloadAllGamesWithLimitTest() throws Exception {
+        int limit = 100;
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/admin/games/reload/all/" + limit)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        Assertions.assertEquals(limit, gameService.count());
+    }
+
+    @Test
+    public void reloadAllGamesWithLimitByRatingTest() throws Exception {
+        int limit = 1000;
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/admin/games/reload/all/" + limit + "/bgg-rating")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        Assertions.assertEquals(limit, gameService.count());
     }
 }

@@ -13,6 +13,7 @@ import ru.zilzilok.avid.boardgames.models.dto.TeseraBoardGameDto;
 import javax.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * https://api.tesera.ru/help/index.html
@@ -34,7 +35,7 @@ public class TeseraApiService implements ApiService {
 
     @Override
     @Transactional
-    public Iterable<BoardGameDto> getAllGames() {
+    public List<BoardGameDto> getAllGames() {
         log.info("Start TeseraApi getAllGames...");
         ArrayList<BoardGameDto> games = new ArrayList<>();
         boolean dataExist = true;
@@ -47,13 +48,49 @@ public class TeseraApiService implements ApiService {
                     .bodyToMono(String.class)
                     .block();
             BoardGameDto[] newGames = gson.fromJson(response, TeseraBoardGameDto[].class);
-            log.info(MessageFormat.format("{0}: {1} games were received.", i, newGames.length));
+            log.info(MessageFormat.format("{0} response: {1} entities were received.", i, newGames.length));
             if (newGames.length != 0) {
                 for (BoardGameDto gameDto : newGames) {
                     if (StringUtils.isNotBlank(gameDto.getAlias())
                             && StringUtils.isNotBlank(gameDto.getDescription())
                             && !games.contains(gameDto)) {
                         games.add(gameDto);
+                    }
+                }
+            } else {
+                dataExist = false;
+            }
+        }
+        log.info(MessageFormat.format("RESULT: {0} games were received.", games.size()));
+        return games;
+    }
+
+    @Override
+    public List<BoardGameDto> getAllGames(boolean sortByBGGRate, int limit) {
+        log.info("Start TeseraApi getAllGames(boolean sortByBGGRate, int limit)...");
+        log.info(sortByBGGRate ? "Reload by rating." : "Reload not by rating.");
+        ArrayList<BoardGameDto> games = new ArrayList<>();
+        boolean dataExist = true;
+        int i = 0;
+        String pattern = "games?offset=%d&limit=%d" + (sortByBGGRate ? "&sort=-ratingn10" : "");
+        while (dataExist && games.size() < limit) {
+            String response = webClient.get()
+                    .uri(String.format(pattern, i++, LIMIT))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            BoardGameDto[] newGames = gson.fromJson(response, TeseraBoardGameDto[].class);
+            log.info(MessageFormat.format("{0} response: {1} entities were received.", i, newGames.length));
+            if (newGames.length != 0) {
+                for (BoardGameDto gameDto : newGames) {
+                    if (StringUtils.isNotBlank(gameDto.getAlias())
+                            && StringUtils.isNotBlank(gameDto.getDescription())
+                            && !games.contains(gameDto)) {
+                        games.add(gameDto);
+                        if(games.size() == limit) {
+                            break;
+                        }
                     }
                 }
             } else {
