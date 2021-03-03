@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.boardgames.controllers;
 
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import ru.zilzilok.avid.boardgames.services.GameService;
 
 @RestController
 @RequestMapping("/admin")
+@Log
 public class BoardGameAdminController {
 
     private final GameService gameService;
@@ -21,7 +23,9 @@ public class BoardGameAdminController {
 
     @GetMapping("/games/reload/all")
     public ResponseEntity<Iterable<BoardGame>> reloadAllGames() {
+        log.info("Start reload all board games.");
         gameService.deleteAll();
+        log.info("All games have been deleted in db.");
         return ResponseEntity.ok(gameService.addAllFromApi());
     }
 }

@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.boardgames.services;
 
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,11 +12,10 @@ import ru.zilzilok.avid.boardgames.services.api.ApiService;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
+@Log
 public class GameService {
     private final GameRepository gameRepo;
     private final ApiService apiService;
@@ -43,7 +43,7 @@ public class GameService {
     }
 
     @Transactional
-    public BoardGame add(BoardGameDto boardGameDto) {
+    public void addGame(BoardGameDto boardGameDto) {
         BoardGame game = BoardGame.builder()
                 .titles(boardGameDto.getTitles())
                 .description(boardGameDto.getDescription())
@@ -56,23 +56,21 @@ public class GameService {
                 .playersMinRecommend(boardGameDto.getPlayersMinRecommend())
                 .playersMaxRecommend(boardGameDto.getPlayersMaxRecommend())
                 .build();
-
-        return gameRepo.save(game);
+        gameRepo.save(game);
     }
 
     @Transactional
-    public Iterable<BoardGame> addAll(Iterable<BoardGameDto> boardGameDtoList) {
-        List<BoardGame> boardGameList = new ArrayList<>();
+    public void addAllGames(Iterable<BoardGameDto> boardGameDtoList) {
         for (BoardGameDto game : boardGameDtoList) {
-            boardGameList.add(add(game));
+            addGame(game);
         }
-        return gameRepo.saveAll(boardGameList);
     }
 
     @Transactional
     public Iterable<BoardGame> addAllFromApi() {
-        addAll(apiService.getAllGames());
-        return getAll(10, 0);
+        addAllGames(apiService.getAllGames());
+        log.info("All games have been added.");
+        return getAllGames(10, 0);
     }
 
     @Transactional
@@ -81,14 +79,14 @@ public class GameService {
     }
 
     @Transactional
-    public Iterable<BoardGame> getAll(int limit, int offset, Sort sort) {
-        Pageable pageable = new OffsetBasedPageRequest(limit, offset, sort);
+    public Iterable<BoardGame> getAllGames(int limit, int offset, Sort sort) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
         return gameRepo.findAll(pageable).getContent();
     }
 
     @Transactional
-    public Iterable<BoardGame> getAll(int limit, int offset) {
-        Pageable pageable = new OffsetBasedPageRequest(limit, offset);
+    public Iterable<BoardGame> getAllGames(int limit, int offset) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit);
         return gameRepo.findAll(pageable).getContent();
     }
 }

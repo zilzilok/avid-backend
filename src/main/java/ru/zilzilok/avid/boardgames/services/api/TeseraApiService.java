@@ -1,11 +1,7 @@
 package ru.zilzilok.avid.boardgames.services.api;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.minidev.json.JSONUtil;
-import org.apache.commons.lang3.ObjectUtils;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -15,15 +11,15 @@ import ru.zilzilok.avid.boardgames.models.dto.BoardGameDto;
 import ru.zilzilok.avid.boardgames.models.dto.TeseraBoardGameDto;
 
 import javax.transaction.Transactional;
+import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * https://api.tesera.ru/help/index.html
  */
 
 @Service
+@Log
 public class TeseraApiService implements ApiService {
 
     private static final int LIMIT = 100;
@@ -39,8 +35,8 @@ public class TeseraApiService implements ApiService {
     @Override
     @Transactional
     public Iterable<BoardGameDto> getAllGames() {
-        List<BoardGameDto> games = new ArrayList<>();
-
+        log.info("Start TeseraApi getAllGames...");
+        ArrayList<BoardGameDto> games = new ArrayList<>();
         boolean dataExist = true;
         int i = 0;
         while (dataExist) {
@@ -51,9 +47,12 @@ public class TeseraApiService implements ApiService {
                     .bodyToMono(String.class)
                     .block();
             BoardGameDto[] newGames = gson.fromJson(response, TeseraBoardGameDto[].class);
+            log.info(MessageFormat.format("{0}: {1} games were received.", i, newGames.length));
             if (newGames.length != 0) {
                 for (BoardGameDto gameDto : newGames) {
-                    if (StringUtils.isNotBlank(gameDto.getAlias())) {
+                    if (StringUtils.isNotBlank(gameDto.getAlias())
+                            && StringUtils.isNotBlank(gameDto.getDescription())
+                            && !games.contains(gameDto)) {
                         games.add(gameDto);
                     }
                 }
@@ -61,7 +60,7 @@ public class TeseraApiService implements ApiService {
                 dataExist = false;
             }
         }
-
+        log.info(MessageFormat.format("RESULT: {0} games were received.", games.size()));
         return games;
     }
 }

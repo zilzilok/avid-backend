@@ -1,6 +1,7 @@
 package ru.zilzilok.avid.boardgames.models.entities;
 
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
@@ -24,9 +25,10 @@ public class BoardGame {
 
     @Column(unique = true)
     private String alias;
+    @Type(type="text")
     private String description;
+    @Type(type="text")
     private String descriptionShort;
-    private String publisherName;
     private String photoUrl;
     private int year;
     private int playersMin;
