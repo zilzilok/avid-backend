@@ -50,6 +50,6 @@ public class BoardGameController {
         }
 
         Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "alias");
-        return ResponseEntity.ok(gameService.getAll(limit, offset, sort));
+        return ResponseEntity.ok(gameService.getAllGames(limit, offset, sort));
     }
 }
