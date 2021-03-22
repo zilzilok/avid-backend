@@ -88,6 +88,12 @@ public class GameService {
     }
 
     @Transactional
+    public Iterable<BoardGame> getAllGames(int limit, int offset, Sort sort, String title) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
+        return gameRepo.findByTitlesContainingIgnoreCase(title, pageable);
+    }
+
+    @Transactional
     public Iterable<BoardGame> getAllGames(int limit, int offset, Sort sort) {
         Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
         return gameRepo.findAll(pageable).getContent();
