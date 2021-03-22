@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.profiles.controllers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,10 @@ public class UserFriendsController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getFriends(Principal p) {
+    public ResponseEntity<?> getFriends(Principal p, @RequestParam(value = "startsWith", required = false) String startsWith) {
+        if(StringUtils.isNotBlank(startsWith)) {
+            return ResponseEntity.ok(userService.getAllFriends(p.getName(), startsWith));
+        }
         User user = userService.findByUsername(p.getName());
         return ResponseEntity.ok(user.getFriends());
     }

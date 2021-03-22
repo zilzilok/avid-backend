@@ -2,9 +2,7 @@ package ru.zilzilok.avid.boardgames;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,39 +55,40 @@ public class BoardGamesTests {
         }
     }
 
-    @Test
-    public void reloadAllGamesTest() throws Exception {
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/admin/games/reload/all")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    @Test
-    public void reloadAllGamesWithLimitTest() throws Exception {
-        int limit = 100;
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/admin/games/reload/all/" + limit)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Assertions.assertEquals(limit, gameService.count());
-    }
-
-    @Test
-    public void reloadAllGamesWithLimitByRatingTest() throws Exception {
-        int limit = 1000;
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/admin/games/reload/all/" + limit + "/bgg-rating")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Assertions.assertEquals(limit, gameService.count());
-    }
+    // RELOAD DB TEST
+//    @Test
+//    public void reloadAllGamesTest() throws Exception {
+//        mockMvc.perform(
+//                MockMvcRequestBuilders.get("/admin/games/reload/all")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
+//                .andDo(MockMvcResultHandlers.print())
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+//    }
+//
+//    @Test
+//    public void reloadAllGamesWithLimitTest() throws Exception {
+//        int limit = 100;
+//        mockMvc.perform(
+//                MockMvcRequestBuilders.get("/admin/games/reload/all/" + limit)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
+//                .andDo(MockMvcResultHandlers.print())
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+//        Assertions.assertEquals(limit, gameService.count());
+//    }
+//
+//    @Test
+//    public void reloadAllGamesWithLimitByRatingTest() throws Exception {
+//        int limit = 1000;
+//        mockMvc.perform(
+//                MockMvcRequestBuilders.get("/admin/games/reload/all/" + limit + "/bgg-rating")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .with(SecurityMockMvcRequestPostProcessors.user(admin.getUsername()).password(admin.getPassword()).roles("ADMIN")))
+//                .andDo(MockMvcResultHandlers.print())
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+//        Assertions.assertEquals(limit, gameService.count());
+//    }
 
     private static Stream<Arguments> validParamsTestData() {
         return Stream.of(

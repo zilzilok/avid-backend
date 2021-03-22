@@ -42,8 +42,7 @@ public class UserController {
     public ResponseEntity<Iterable<User>> getUsers(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                                                    @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
                                                    @RequestParam(value = "sort", required = false) String sortType,
-                                                   @RequestParam(value = "firstName", required = false) String firstStartsWith,
-                                                   @RequestParam(value = "secondName", required = false) String secondStartsWith) {
+                                                   @RequestParam(value = "startsWith", required = false) String startsWith) {
         if (limit < 1 || limit > 100) {
             limit = 10;
         }
@@ -61,18 +60,11 @@ public class UserController {
         }
 
         Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "username");
-        boolean firstNameIsBlank = StringUtils.isBlank(firstStartsWith);
-        boolean secondNameIsBlank = StringUtils.isBlank(secondStartsWith);
-        if(firstNameIsBlank) {
-            if(secondNameIsBlank){
-                return ResponseEntity.ok(userService.getAll(limit, offset, sort));
-            }
-            return ResponseEntity.ok(userService.getAllBySecondNameStartingWith(limit, offset, sort, StringUtils.trim(secondStartsWith)));
+
+        if (StringUtils.isNotBlank(startsWith)) {
+            return ResponseEntity.ok(userService.getAll(limit, offset, sort, StringUtils.trim(startsWith)));
         }
-        else if(secondNameIsBlank) {
-            return ResponseEntity.ok(userService.getAllByFirstNameStartingWith(limit, offset, sort, StringUtils.trim(firstStartsWith)));
-        }
-        return ResponseEntity.ok(userService.getAll(limit, offset, sort, StringUtils.trim(firstStartsWith), StringUtils.trim(secondStartsWith)));
+        return ResponseEntity.ok(userService.getAll(limit, offset, sort));
     }
 
     @GetMapping("/info")
