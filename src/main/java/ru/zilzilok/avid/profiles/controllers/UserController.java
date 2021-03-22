@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.profiles.controllers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -40,7 +41,9 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<Iterable<User>> getUsers(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                                                    @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
-                                                   @RequestParam(value = "sort", required = false) String sortType) {
+                                                   @RequestParam(value = "sort", required = false) String sortType,
+                                                   @RequestParam(value = "firstName", required = false) String firstStartsWith,
+                                                   @RequestParam(value = "secondName", required = false) String secondStartsWith) {
         if (limit < 1 || limit > 100) {
             limit = 10;
         }
@@ -58,7 +61,18 @@ public class UserController {
         }
 
         Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "username");
-        return ResponseEntity.ok(userService.getAll(limit, offset, sort));
+        boolean firstNameIsBlank = StringUtils.isBlank(firstStartsWith);
+        boolean secondNameIsBlank = StringUtils.isBlank(secondStartsWith);
+        if(firstNameIsBlank) {
+            if(secondNameIsBlank){
+                return ResponseEntity.ok(userService.getAll(limit, offset, sort));
+            }
+            return ResponseEntity.ok(userService.getAllBySecondNameStartingWith(limit, offset, sort, StringUtils.trim(secondStartsWith)));
+        }
+        else if(secondNameIsBlank) {
+            return ResponseEntity.ok(userService.getAllByFirstNameStartingWith(limit, offset, sort, StringUtils.trim(firstStartsWith)));
+        }
+        return ResponseEntity.ok(userService.getAll(limit, offset, sort, StringUtils.trim(firstStartsWith), StringUtils.trim(secondStartsWith)));
     }
 
     @GetMapping("/info")

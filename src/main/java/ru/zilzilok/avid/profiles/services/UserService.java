@@ -94,6 +94,24 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    public Iterable<User> getAllByFirstNameStartingWith(int limit, int offset, Sort sort, String startsWith) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
+        return userRepo.findByFirstNameStartingWithIgnoreCase(startsWith, pageable);
+    }
+
+    @Transactional
+    public Iterable<User> getAllBySecondNameStartingWith(int limit, int offset, Sort sort, String startsWith) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
+        return userRepo.findBySecondNameStartingWithIgnoreCase(startsWith, pageable);
+    }
+
+    @Transactional
+    public Iterable<User> getAll(int limit, int offset, Sort sort, String firstName, String secondName) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
+        return userRepo.findByFirstNameStartingWithAndSecondNameStartingWithIgnoreCase(firstName, secondName, pageable);
+    }
+
+    @Transactional
     public User registerNewUserAccount(UserRegDto userRegDto) {
         String username = userRegDto.getUsername();
         String email = userRegDto.getEmail();

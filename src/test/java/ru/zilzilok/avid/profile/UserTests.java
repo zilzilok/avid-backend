@@ -94,25 +94,30 @@ public class UserTests {
 
     private static Stream<Arguments> validParamsTestData() {
         return Stream.of(
-                Arguments.of("1", "0", ""),
-                Arguments.of("10", "0", ""),
-                Arguments.of("10", "0", "asc"),
-                Arguments.of("10", "0", "desc"),
-                Arguments.of("3", "2", ""),
-                Arguments.of("3", "2", "ASC"),
-                Arguments.of("3", "2", "DESC"),
-                Arguments.of("3", "1", "aSc"),
-                Arguments.of("3", "1", "AsC"),
-                Arguments.of("3", "1", "DeSc"),
-                Arguments.of("-1", "-1", "")
+                Arguments.of("1", "0", "", "", ""),
+                Arguments.of("10", "0", "", "", ""),
+                Arguments.of("10", "0", "asc", "", ""),
+                Arguments.of("10", "0", "desc", "", ""),
+                Arguments.of("3", "2", "", "", ""),
+                Arguments.of("3", "2", "ASC", "", ""),
+                Arguments.of("3", "2", "DESC", "", ""),
+                Arguments.of("3", "1", "aSc", "", ""),
+                Arguments.of("3", "1", "AsC", "", ""),
+                Arguments.of("3", "1", "DeSc", "", ""),
+                Arguments.of("3", "0", "asc",  "o", ""),
+                Arguments.of("3", "0", "asc",  "O", ""),
+                Arguments.of("3", "0", "asc",  "", "h"),
+                Arguments.of("3", "0", "asc",  "", "H"),
+                Arguments.of("-1", "-1", "", "", "")
         );
     }
 
-    @ParameterizedTest(name = "#{index} - Run test with limit =''{0}'', offset =''{1}'', sort =''{2}''")
+    @ParameterizedTest(name = "#{index} - Run test with limit =''{0}'', offset =''{1}'', sort =''{2}'', fn =''{3}'', sn =''{4}''")
     @MethodSource("validParamsTestData")
-    public void getAllWithParamsOkTest(String limit, String offset, String sort) throws Exception {
+    public void getAllWithParamsOkTest(String limit, String offset, String sort, String fn, String sn) throws Exception {
         String content = mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("%s/all?limit=%s&offset=%s&sort=%s", URL, limit, offset, sort))
+                MockMvcRequestBuilders.get(String.format("%s/all?limit=%s&offset=%s&sort=%s&firstName=%s&secondName=%s",
+                        URL, limit, offset, sort, fn, sn))
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
