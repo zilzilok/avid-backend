@@ -1,5 +1,6 @@
 package ru.zilzilok.avid.boardgames.controllers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,8 @@ public class BoardGameController {
     @GetMapping("/all")
     public ResponseEntity<Iterable<BoardGame>> getGames(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                                                         @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
-                                                        @RequestParam(value = "sort", required = false) String sortType) {
+                                                        @RequestParam(value = "sort", required = false) String sortType,
+                                                        @RequestParam(value = "title", required = false) String title) {
         if (limit < 0 || limit > 100) {
             limit = 10;
         }
@@ -50,6 +52,9 @@ public class BoardGameController {
         }
 
         Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "alias");
+        if (StringUtils.isNotBlank(title)) {
+            return ResponseEntity.ok(gameService.getAllGames(limit, offset, sort, StringUtils.trim(title)));
+        }
         return ResponseEntity.ok(gameService.getAllGames(limit, offset, sort));
     }
 }

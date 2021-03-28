@@ -35,6 +35,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql'
 
+    // Amazon storage
+    implementation 'com.amazonaws:aws-java-sdk:1.11.163'
+
     // Spring Mail
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
