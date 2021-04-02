@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
+import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.profiles.models.dto.UserInfoDto;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
@@ -165,5 +166,15 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void addFriend(User user, User friend) {
         user.getFriends().add(friend);
+    }
+
+    @Transactional
+    public void addGame(User user, BoardGame boardGame) {
+        user.getGames().add(boardGame);
+    }
+
+    @Transactional
+    public void removeGame(User user, BoardGame boardGame) {
+        user.getGames().remove(boardGame);
     }
 }

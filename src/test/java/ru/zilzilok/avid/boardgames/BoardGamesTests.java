@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
 import ru.zilzilok.avid.profile.ProfileTestData;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
@@ -122,6 +123,6 @@ public class BoardGamesTests {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        System.out.println("count = " + GSON_INSTANCE.fromJson(content, User[].class).length);
+        System.out.println("count = " + GSON_INSTANCE.fromJson(content, BoardGame[].class).length);
     }
 }

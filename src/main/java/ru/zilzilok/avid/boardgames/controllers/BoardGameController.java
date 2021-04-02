@@ -6,18 +6,27 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.zilzilok.avid.boardgames.models.dto.UserBoardGameDto;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
+import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.profiles.services.UserService;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/games")
 public class BoardGameController {
 
     private final GameService gameService;
+    private final UserService userService;
 
     @Autowired
-    public BoardGameController(GameService gameService) {
+    public BoardGameController(GameService gameService, UserService userService) {
         this.gameService = gameService;
+        this.userService = userService;
     }
 
     @GetMapping("/{id}")
@@ -31,10 +40,12 @@ public class BoardGameController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Iterable<BoardGame>> getGames(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
-                                                        @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
-                                                        @RequestParam(value = "sort", required = false) String sortType,
-                                                        @RequestParam(value = "title", required = false) String title) {
+    public ResponseEntity<?> getGames(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                      @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+                                      @RequestParam(value = "sort", required = false) String sortType,
+                                      @RequestParam(value = "title", required = false) String title,
+                                      @RequestParam(value = "byUser", required = false, defaultValue = "false") boolean byUser,
+                                      Principal p) {
         if (limit < 0 || limit > 100) {
             limit = 10;
         }
@@ -52,9 +63,22 @@ public class BoardGameController {
         }
 
         Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "alias");
+        Iterable<BoardGame> boardGames;
         if (StringUtils.isNotBlank(title)) {
-            return ResponseEntity.ok(gameService.getAllGames(limit, offset, sort, StringUtils.trim(title)));
+            boardGames = gameService.getAllGames(limit, offset, sort, StringUtils.trim(title));
+        } else {
+            boardGames = gameService.getAllGames(limit, offset, sort);
         }
-        return ResponseEntity.ok(gameService.getAllGames(limit, offset, sort));
+
+        if (byUser) {
+            List<UserBoardGameDto> userBoardGames = new ArrayList<>();
+            User user = userService.findByUsername(p.getName());
+            boardGames.forEach(boardGame -> {
+                userBoardGames.add(new UserBoardGameDto(boardGame, boardGame.getOwners().contains(user)));
+            });
+            return ResponseEntity.ok(userBoardGames);
+        }
+
+        return ResponseEntity.ok(boardGames);
     }
 }
