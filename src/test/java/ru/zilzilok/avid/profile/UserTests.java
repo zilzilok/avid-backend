@@ -24,6 +24,8 @@ import ru.zilzilok.avid.profiles.models.dto.UserInfoDto;
 import ru.zilzilok.avid.profiles.models.dto.UserRegDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
+import ru.zilzilok.avid.profiles.models.other.UserGame;
+import ru.zilzilok.avid.profiles.services.UserGameService;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.util.stream.Stream;
@@ -40,6 +42,7 @@ public class UserTests {
     private final MockMvc mockMvc;
     private final UserService userService;
     private final GameService gameService;
+    private final UserGameService userGameService;
     private User testUser;
 
     private User getTestUser() {
@@ -47,10 +50,11 @@ public class UserTests {
     }
 
     @Autowired
-    public UserTests(UserService userService, MockMvc mockMvc, GameService gameService) {
+    public UserTests(UserService userService, MockMvc mockMvc, GameService gameService, UserGameService userGameService) {
         this.userService = userService;
         this.mockMvc = mockMvc;
         this.gameService = gameService;
+        this.userGameService = userGameService;
     }
 
     @BeforeEach
@@ -286,14 +290,14 @@ public class UserTests {
 
         /* testUser is adding board game */
         mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/games/add/" + game.getId())
+                MockMvcRequestBuilders.post(URL + "/games/add/" + game.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/games/add/" + game.getId())
+                MockMvcRequestBuilders.post(URL + "/games/add/" + game.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
@@ -301,9 +305,10 @@ public class UserTests {
 
         game = gameService.findById(game.getId());
         testUser = getTestUser();
+        UserGame userGame = userGameService.findById(testUser.getId(), game.getId());
 
-        Assertions.assertTrue(game.getOwners().contains(testUser));
-        Assertions.assertTrue(testUser.getGames().contains(game));
+        Assertions.assertTrue(game.getOwners().contains(userGame));
+        Assertions.assertTrue(testUser.getGames().contains(userGame));
 
         /* testUser is removing board game */
         mockMvc.perform(
@@ -320,11 +325,8 @@ public class UserTests {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        game = gameService.findById(game.getId());
-        testUser = getTestUser();
-
-        Assertions.assertFalse(game.getOwners().contains(testUser));
-        Assertions.assertFalse(testUser.getGames().contains(game));
+        userGame = userGameService.findById(testUser.getId(), game.getId());
+        Assertions.assertNull(userGame);
     }
 
     @Test
@@ -349,23 +351,25 @@ public class UserTests {
 
         /* testUser is adding board game */
         mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/games/add?alias=" + game.getAlias())
+                MockMvcRequestBuilders.post(URL + "/games/add?alias=" + game.getAlias())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get(URL + "/games/add?alias=" + game.getAlias())
+                MockMvcRequestBuilders.post(URL + "/games/add?alias=" + game.getAlias())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        game = gameService.findByAlias(game.getAlias());
+        game = gameService.findById(game.getId());
+        testUser = getTestUser();
+        UserGame userGame = userGameService.findById(testUser.getId(), game.getId());
 
-        Assertions.assertTrue(game.getOwners().contains(getTestUser()));
-        Assertions.assertTrue(getTestUser().getGames().contains(game));
+        Assertions.assertTrue(game.getOwners().contains(userGame));
+        Assertions.assertTrue(testUser.getGames().contains(userGame));
 
         /* testUser is removing board game */
         mockMvc.perform(
@@ -382,9 +386,7 @@ public class UserTests {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        game = gameService.findByAlias(game.getAlias());
-
-        Assertions.assertFalse(game.getOwners().contains(getTestUser()));
-        Assertions.assertFalse(getTestUser().getGames().contains(game));
+        userGame = userGameService.findById(testUser.getId(), game.getId());
+        Assertions.assertNull(userGame);
     }
 }

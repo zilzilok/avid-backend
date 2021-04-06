@@ -3,7 +3,7 @@ package ru.zilzilok.avid.boardgames.models.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.Type;
-import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.profiles.models.other.UserGame;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,22 +28,23 @@ public class BoardGame {
     @ToString.Exclude
     private List<String> titles;
 
-    @ManyToMany(
-            targetEntity = User.class, mappedBy = "games",
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
+    @OneToMany(
+            mappedBy = "game",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
             fetch = FetchType.EAGER
     )
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<User> owners;
+    private Set<UserGame> owners;
 
     @Column(unique = true)
     private String alias;
-    @Type(type="text")
+    @Type(type = "text")
     private String description;
-    @Type(type="text")
+    @Type(type = "text")
     private String descriptionShort;
     private String photoUrl;
     private int year;
