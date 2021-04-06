@@ -9,11 +9,13 @@ import ru.zilzilok.avid.boardgames.models.dto.BoardGameDto;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.repositories.GameRepository;
 import ru.zilzilok.avid.boardgames.services.api.ApiService;
+import ru.zilzilok.avid.profiles.models.other.UserGame;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -35,12 +37,20 @@ public class GameService {
     @Transactional
     public BoardGame findById(Long id) {
         Optional<BoardGame> game = gameRepo.findById(id);
-        return game.orElse(null);
+        BoardGame boardGame = game.orElse(null);
+        if(boardGame != null){
+            return addAverageRating(boardGame);
+        }
+        return null;
     }
 
     @Transactional
     public BoardGame findByAlias(String alias) {
-        return gameRepo.findByAlias(alias);
+        BoardGame boardGame = gameRepo.findByAlias(alias);
+        if(boardGame != null){
+            return addAverageRating(boardGame);
+        }
+        return null;
     }
 
     @Transactional
@@ -71,7 +81,7 @@ public class GameService {
     public Iterable<BoardGame> addAllFromApi() {
         addAllGames(apiService.getAllGames());
         log.info("All games have been added.");
-        return getAllGames(10, 0);
+        return addAverageRating(getAllGames(10, 0));
     }
 
     @Transactional
@@ -79,29 +89,40 @@ public class GameService {
         List<BoardGameDto> boardGameDtoList = apiService.getAllGames(sortByBGGRate, limit);
         addAllGames(boardGameDtoList);
         log.info(boardGameDtoList.size() + " games have been added.");
-        return getAllGames(10, 0);
-    }
-
-    @Transactional
-    public Long count() {
-        return gameRepo.count();
+        return addAverageRating(getAllGames(10, 0));
     }
 
     @Transactional
     public Iterable<BoardGame> getAllGames(int limit, int offset, Sort sort, String title) {
         Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
-        return gameRepo.findByTitlesContainingIgnoreCase(title, pageable);
+        return addAverageRating(gameRepo.findByTitlesContainingIgnoreCase(title, pageable));
     }
 
     @Transactional
     public Iterable<BoardGame> getAllGames(int limit, int offset, Sort sort) {
         Pageable pageable = new OffsetBasedPageRequest(offset, limit, sort);
-        return gameRepo.findAll(pageable).getContent();
+        return addAverageRating(gameRepo.findAll(pageable).getContent());
     }
 
     @Transactional
     public Iterable<BoardGame> getAllGames(int limit, int offset) {
         Pageable pageable = new OffsetBasedPageRequest(offset, limit);
-        return gameRepo.findAll(pageable).getContent();
+        return addAverageRating(gameRepo.findAll(pageable).getContent());
+    }
+
+    private Iterable<BoardGame> addAverageRating(Iterable<BoardGame> boardGames) {
+        boardGames.forEach(boardGame -> {
+            List<Double> ratings = boardGame.getOwners().stream().map(UserGame::getRating).collect(Collectors.toList());
+            double averageRating = ratings.size() > 0 ? ratings.stream().reduce(0., Double::sum) / ratings.size() : 0;
+            boardGame.setAverageRating(averageRating);
+        });
+        return boardGames;
+    }
+
+    private BoardGame addAverageRating(BoardGame boardGame) {
+        List<Double> ratings = boardGame.getOwners().stream().map(UserGame::getRating).collect(Collectors.toList());
+        double averageRating = ratings.size() > 0 ? ratings.stream().reduce(0., Double::sum) / ratings.size() : 0;
+        boardGame.setAverageRating(averageRating);
+        return boardGame;
     }
 }

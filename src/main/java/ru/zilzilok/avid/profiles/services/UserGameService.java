@@ -25,7 +25,6 @@ public class UserGameService {
         return userGameRepo.findByIdGameIdAndIdUserId(gameId, userId);
     }
 
-
     @Transactional
     public void addGame(User user, BoardGame boardGame, String review, double rating) {
         UserGame userGame = new UserGame(user, boardGame, review, rating);
