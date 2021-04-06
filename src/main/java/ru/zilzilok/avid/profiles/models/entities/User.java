@@ -5,7 +5,7 @@ import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
+import ru.zilzilok.avid.profiles.models.other.UserGame;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
 import ru.zilzilok.avid.сlubs.models.entities.Club;
 
@@ -106,21 +106,17 @@ public class User implements UserDetails {
     @ToString.Exclude
     private Set<Club> ownClubs;
 
-    @ManyToMany(
-            targetEntity = BoardGame.class,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+    @OneToMany(
+            mappedBy = "owner",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
             fetch = FetchType.EAGER
-    )
-    @JoinTable(
-            name = "user_games",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "game_id")
     )
     @JsonIgnore
     @Singular
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<BoardGame> games;
+    private Set<UserGame> games;
 
     public void setFirstName(String firstName) {
         if (StringUtils.isNotBlank(firstName)) {
