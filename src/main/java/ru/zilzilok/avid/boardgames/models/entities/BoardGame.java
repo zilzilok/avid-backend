@@ -52,4 +52,6 @@ public class BoardGame {
     private int playersMax;
     private int playersMinRecommend;
     private int playersMaxRecommend;
+    @Transient
+    private double averageRating;
 }

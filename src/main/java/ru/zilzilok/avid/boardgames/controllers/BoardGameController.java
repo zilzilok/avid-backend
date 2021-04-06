@@ -10,6 +10,7 @@ import ru.zilzilok.avid.boardgames.models.dto.UserBoardGameDto;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
 import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.profiles.services.UserGameService;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.security.Principal;
@@ -22,11 +23,13 @@ public class BoardGameController {
 
     private final GameService gameService;
     private final UserService userService;
+    private final UserGameService userGameService;
 
     @Autowired
-    public BoardGameController(GameService gameService, UserService userService) {
+    public BoardGameController(GameService gameService, UserService userService, UserGameService userGameService) {
         this.gameService = gameService;
         this.userService = userService;
+        this.userGameService = userGameService;
     }
 
     @GetMapping("/{id}")
@@ -74,7 +77,7 @@ public class BoardGameController {
             List<UserBoardGameDto> userBoardGames = new ArrayList<>();
             User user = userService.findByUsername(p.getName());
             boardGames.forEach(boardGame -> {
-                userBoardGames.add(new UserBoardGameDto(boardGame, boardGame.getOwners().contains(user)));
+                userBoardGames.add(new UserBoardGameDto(boardGame, userGameService.findById(user.getId(), boardGame.getId()) != null));
             });
             return ResponseEntity.ok(userBoardGames);
         }

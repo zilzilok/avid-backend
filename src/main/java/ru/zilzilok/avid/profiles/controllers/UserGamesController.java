@@ -11,6 +11,8 @@ import ru.zilzilok.avid.profiles.services.UserGameService;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -27,17 +29,26 @@ public class UserGamesController {
         this.userGameService = userGameService;
     }
 
+    private Iterable<UserGame> addAverageRating(Iterable<UserGame> userGames){
+        userGames.forEach(bg ->{
+            List<Double> ratings = bg.getGame().getOwners().stream().map(UserGame::getRating).collect(Collectors.toList());
+            double averageRating = ratings.size() > 0 ? ratings.stream().reduce(0., Double::sum) / ratings.size() : 0;
+            bg.getGame().setAverageRating(averageRating);
+        });
+        return userGames;
+    }
+
     @GetMapping("/games")
     public ResponseEntity<?> getUserGames(Principal p) {
         User user = userService.findByUsername(p.getName());
-        return ResponseEntity.ok(user.getGames());
+        return ResponseEntity.ok(addAverageRating(user.getGames()));
     }
 
     @GetMapping("/{id}/games")
     public ResponseEntity<?> getUserGames(@PathVariable("id") Long id) {
         User user = userService.findById(id);
         if (user != null) {
-            return ResponseEntity.ok(user.getGames());
+            return ResponseEntity.ok(addAverageRating(user.getGames()));
         }
         return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
     }
