@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.zilzilok.avid.boardgames.models.dto.GameOwnerDto;
 import ru.zilzilok.avid.boardgames.models.dto.UserBoardGameDto;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
@@ -76,12 +77,29 @@ public class BoardGameController {
         if (byUser) {
             List<UserBoardGameDto> userBoardGames = new ArrayList<>();
             User user = userService.findByUsername(p.getName());
-            boardGames.forEach(boardGame -> {
-                userBoardGames.add(new UserBoardGameDto(boardGame, userGameService.findById(user.getId(), boardGame.getId()) != null));
-            });
+            boardGames.forEach(boardGame ->
+                    userBoardGames.add(new UserBoardGameDto(boardGame, userGameService.findById(user.getId(), boardGame.getId()) != null)));
             return ResponseEntity.ok(userBoardGames);
         }
 
         return ResponseEntity.ok(boardGames);
+    }
+
+    @GetMapping("/{id}/owners")
+    public ResponseEntity<?> getOwners(@PathVariable("id") Long id) {
+        BoardGame game = gameService.findById(id);
+        List<GameOwnerDto> gameOwners = new ArrayList<>();
+        game.getOwners().forEach(userGame ->
+                gameOwners.add(new GameOwnerDto(userGame.getOwner(), userGame.getReview(), userGame.getRating(), userGame.getCreatingDateTime())));
+        return ResponseEntity.ok(gameOwners);
+    }
+
+    @GetMapping("/owners")
+    public ResponseEntity<?> getOwners(@RequestParam(value = "alias", required = false, defaultValue = "") String alias) {
+        BoardGame game = gameService.findByAlias(alias);
+        List<GameOwnerDto> gameOwners = new ArrayList<>();
+        game.getOwners().forEach(userGame ->
+                gameOwners.add(new GameOwnerDto(userGame.getOwner(), userGame.getReview(), userGame.getRating(), userGame.getCreatingDateTime())));
+        return ResponseEntity.ok(gameOwners);
     }
 }
