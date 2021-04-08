@@ -103,7 +103,7 @@ public class UserGamesController {
                         .body(String.format("%s doesn't have board game with id = %d.", p.getName(), id));
             }
 
-            userGameService.removeGame(user, game);
+            userGameService.removeGame(user, game, userGame);
             return ResponseEntity.ok(String.format("The board game with id = %d removed successfully.", id));
         }
         return ResponseEntity.badRequest().body(String.format("Board game with id = %d doesn't exist.", id));
@@ -120,7 +120,7 @@ public class UserGamesController {
                         .body(String.format("%s doesn't have board game with alias = %s.", p.getName(), alias));
             }
 
-            userGameService.removeGame(user, game);
+            userGameService.removeGame(user, game, userGame);
             return ResponseEntity.ok(String.format("The board game with alias = %s removed successfully.", alias));
         }
         return ResponseEntity.badRequest().body(String.format("Board game with alias = %s doesn't exist.", alias));

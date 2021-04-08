@@ -53,5 +53,7 @@ public class BoardGame {
     private int playersMinRecommend;
     private int playersMaxRecommend;
     @Transient
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private double averageRating;
 }

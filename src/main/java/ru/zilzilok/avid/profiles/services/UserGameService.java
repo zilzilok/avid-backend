@@ -34,9 +34,7 @@ public class UserGameService {
     }
 
     @Transactional
-    public void removeGame(User user, BoardGame boardGame) {
-        UserGame userGame = new UserGame(user, boardGame);
-
+    public void removeGame(User user, BoardGame boardGame, UserGame userGame) {
         user.getGames().remove(userGame);
         boardGame.getOwners().remove(userGame);
     }
