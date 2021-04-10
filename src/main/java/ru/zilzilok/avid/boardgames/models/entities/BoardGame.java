@@ -2,7 +2,10 @@ package ru.zilzilok.avid.boardgames.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Parameter;
+
 import ru.zilzilok.avid.profiles.models.other.UserGame;
 
 import javax.persistence.*;
@@ -18,7 +21,16 @@ import java.util.Set;
 public class BoardGame {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "sequence-generator")
+    @GenericGenerator(
+            name = "sequence-generator",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @Parameter(name = "sequence_name", value = "user_sequence"),
+                    @Parameter(name = "initial_value", value = "1"),
+                    @Parameter(name = "increment_size", value = "1")
+            }
+    )
     private Long id;
 
     @ElementCollection
@@ -52,6 +64,9 @@ public class BoardGame {
     private int playersMax;
     private int playersMinRecommend;
     private int playersMaxRecommend;
+    private int playtimeMin;
+    private int playtimeMax;
+    private int playersAgeMin;
     @Transient
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

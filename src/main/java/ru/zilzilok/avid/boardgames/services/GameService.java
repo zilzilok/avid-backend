@@ -66,6 +66,9 @@ public class GameService {
                 .playersMax(boardGameDto.getPlayersMax())
                 .playersMinRecommend(boardGameDto.getPlayersMinRecommend())
                 .playersMaxRecommend(boardGameDto.getPlayersMaxRecommend())
+                .playtimeMin(boardGameDto.getPlaytimeMin())
+                .playtimeMax(boardGameDto.getPlaytimeMax())
+                .playersAgeMin(boardGameDto.getPlayersAgeMin())
                 .build();
         gameRepo.save(game);
     }

@@ -22,5 +22,11 @@ public abstract class BoardGameDto {
 
     public abstract int getPlayersMaxRecommend();
 
+    public abstract int getPlaytimeMin();
+
+    public abstract int getPlaytimeMax();
+
+    public abstract int getPlayersAgeMin();
+
     public abstract int getYear();
 }
