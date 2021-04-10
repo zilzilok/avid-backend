@@ -34,7 +34,7 @@ public class BoardGameAdminController {
 
     @GetMapping("/games/reload/all/{limit}")
     public ResponseEntity<Iterable<BoardGame>> reloadAllGames(@PathVariable("limit") int limit) {
-        if (limit < 0 || limit > 1000) {
+        if (limit < 0) {
             limit = 1000;
         }
         log.info(MessageFormat.format("Start reload all board games with limit = {0}.", limit));
@@ -45,7 +45,7 @@ public class BoardGameAdminController {
 
     @GetMapping("/games/reload/all/{limit}/bgg-rating")
     public ResponseEntity<Iterable<BoardGame>> reloadAllGamesByRating(@PathVariable("limit") int limit) {
-        if (limit < 0 || limit > 1000) {
+        if (limit < 0) {
             limit = 1000;
         }
         log.info(MessageFormat.format("Start reload all board games by BGG rating with limit = {0}.", limit));
