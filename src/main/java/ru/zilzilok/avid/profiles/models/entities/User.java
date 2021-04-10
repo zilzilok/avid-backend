@@ -3,10 +3,12 @@ package ru.zilzilok.avid.profiles.models.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.zilzilok.avid.profiles.models.other.UserGame;
 import ru.zilzilok.avid.profiles.models.enums.Gender;
+import ru.zilzilok.avid.profiles.models.other.UserGame;
 import ru.zilzilok.avid.сlubs.models.entities.Club;
 
 import javax.persistence.*;
@@ -22,7 +24,16 @@ import java.util.Set;
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "sequence-generator")
+    @GenericGenerator(
+            name = "sequence-generator",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @Parameter(name = "sequence_name", value = "user_sequence"),
+                    @Parameter(name = "initial_value", value = "1"),
+                    @Parameter(name = "increment_size", value = "1")
+            }
+    )
     private Long id;
 
     @Column(unique = true)

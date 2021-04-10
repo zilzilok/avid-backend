@@ -26,6 +26,9 @@ public class TeseraBoardGameDto extends BoardGameDto {
     private int playersMax;
     private int playersMinRecommend;
     private int playersMaxRecommend;
+    private int playtimeMin;
+    private int playtimeMax;
+    private int playersAgeMin;
     private int year;
 
     @Override
@@ -79,6 +82,21 @@ public class TeseraBoardGameDto extends BoardGameDto {
     }
 
     @Override
+    public int getPlaytimeMin() {
+        return playtimeMin;
+    }
+
+    @Override
+    public int getPlaytimeMax() {
+        return playtimeMax;
+    }
+
+    @Override
+    public int getPlayersAgeMin() {
+        return playersAgeMin;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
@@ -86,7 +104,7 @@ public class TeseraBoardGameDto extends BoardGameDto {
 
         TeseraBoardGameDto that = (TeseraBoardGameDto) o;
 
-        if(that.getAlias().equals(alias)) {
+        if (that.getAlias().equals(alias)) {
             return true;
         }
 
