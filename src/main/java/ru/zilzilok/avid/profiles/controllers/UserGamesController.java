@@ -2,6 +2,7 @@ package ru.zilzilok.avid.profiles.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
@@ -39,15 +40,35 @@ public class UserGamesController {
     }
 
     @GetMapping("/games")
-    public ResponseEntity<?> getUserGames(Principal p) {
+    public ResponseEntity<?> getUserGames(Principal p,
+                                          @RequestParam(value = "sort", required = false) String sortType) {
         User user = userService.findByUsername(p.getName());
+        if (!ObjectUtils.isEmpty(sortType)) {
+            if (sortType.equalsIgnoreCase("asc".trim())) {
+                List<UserGame> userGames = userGameService.findByIdOrderByAsc(user.getId());
+                return ResponseEntity.ok(addAverageRating(userGames));
+            } else if (sortType.equalsIgnoreCase("desc".trim())) {
+                List<UserGame> userGames = userGameService.findByIdOrderByDesc(user.getId());
+                return ResponseEntity.ok(addAverageRating(userGames));
+            }
+        }
         return ResponseEntity.ok(addAverageRating(user.getGames()));
     }
 
     @GetMapping("/{id}/games")
-    public ResponseEntity<?> getUserGames(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getUserGames(@PathVariable("id") Long id,
+                                          @RequestParam(value = "sort", required = false) String sortType) {
         User user = userService.findById(id);
         if (user != null) {
+            if (!ObjectUtils.isEmpty(sortType)) {
+                if (sortType.equalsIgnoreCase("asc".trim())) {
+                    List<UserGame> userGames = userGameService.findByIdOrderByAsc(user.getId());
+                    return ResponseEntity.ok(addAverageRating(userGames));
+                } else if (sortType.equalsIgnoreCase("desc".trim())) {
+                    List<UserGame> userGames = userGameService.findByIdOrderByDesc(user.getId());
+                    return ResponseEntity.ok(addAverageRating(userGames));
+                }
+            }
             return ResponseEntity.ok(addAverageRating(user.getGames()));
         }
         return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
