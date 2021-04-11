@@ -5,19 +5,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.zilzilok.avid.profiles.models.entities.User;
+import ru.zilzilok.avid.profiles.models.other.UserGame;
+import ru.zilzilok.avid.profiles.services.UserGameService;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user/friends")
 public class UserFriendsController {
 
     private final UserService userService;
+    private final UserGameService userGameService;
 
     @Autowired
-    public UserFriendsController(UserService userService) {
+    public UserFriendsController(UserService userService, UserGameService userGameService) {
         this.userService = userService;
+        this.userGameService = userGameService;
     }
 
     @GetMapping
@@ -72,5 +77,24 @@ public class UserFriendsController {
             return ResponseEntity.badRequest().body("User can't add yourself to friends list.");
         }
         return ResponseEntity.badRequest().body(String.format("User with username = %s doesn't exist.", username));
+    }
+
+    @GetMapping("/games")
+    public ResponseEntity<?> getFriendsGames(Principal p,
+                                             @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+                                             @RequestParam(value = "sort", required = false) String sortType) {
+        if (limit < 0 || limit > 100) {
+            limit = 10;
+        }
+        if (offset < 0) {
+            offset = 0;
+        }
+
+        User user = userService.findByUsername(p.getName());
+
+        List<UserGame> userFriendsGames = userGameService.findFriendsGames(user.getId(), limit, offset, sortType);
+
+        return ResponseEntity.ok(userGameService.addAverageRating(userFriendsGames));
     }
 }
