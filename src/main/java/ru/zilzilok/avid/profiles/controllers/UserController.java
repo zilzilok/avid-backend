@@ -7,12 +7,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.zilzilok.avid.profiles.models.dto.UserFriendDto;
 import ru.zilzilok.avid.profiles.models.dto.UserInfoDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -39,10 +42,12 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Iterable<User>> getUsers(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+    public ResponseEntity<?> getUsers(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                                                    @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
                                                    @RequestParam(value = "sort", required = false) String sortType,
-                                                   @RequestParam(value = "startsWith", required = false) String startsWith) {
+                                                   @RequestParam(value = "startsWith", required = false) String startsWith,
+                                                   @RequestParam(value = "byUser", required = false, defaultValue = "false") boolean byUser,
+                                                   Principal p) {
         if (limit < 1 || limit > 100) {
             limit = 10;
         }
@@ -61,10 +66,22 @@ public class UserController {
 
         Sort sort = sortDirection == null ? Sort.unsorted() : Sort.by(sortDirection, "username");
 
+        Iterable<User> users;
         if (StringUtils.isNotBlank(startsWith)) {
-            return ResponseEntity.ok(userService.getAll(limit, offset, sort, StringUtils.trim(startsWith)));
+            users = userService.getAll(limit, offset, sort, StringUtils.trim(startsWith));
         }
-        return ResponseEntity.ok(userService.getAll(limit, offset, sort));
+        else{
+            users = userService.getAll(limit, offset, sort);
+        }
+
+        if (byUser) {
+            List<UserFriendDto> userFriends = new ArrayList<>();
+            User user = userService.findByUsername(p.getName());
+            users.forEach(friend ->
+                    userFriends.add(new UserFriendDto(friend, user.getFriends().contains(friend))));
+            return ResponseEntity.ok(userFriends);
+        }
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/info")
