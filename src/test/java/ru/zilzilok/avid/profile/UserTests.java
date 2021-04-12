@@ -266,6 +266,42 @@ public class UserTests {
         friend = userService.findByUsername(username);
         Assertions.assertTrue(friend.getFriends().contains(getTestUser()));
         Assertions.assertTrue(getTestUser().getFriends().contains(friend));
+
+        /* remove new user to friends of testUser */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/remove/" + friend.getId())
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        /* "testUser can't remove yourself from friends list" */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/remove/" + testUser.getId())
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getUsername()).password(testUser.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        friend = userService.findByUsername(username);
+        Assertions.assertTrue(friend.getFriends().contains(getTestUser()));
+        Assertions.assertFalse(getTestUser().getFriends().contains(friend));
+
+        /* remove testUser to friends of new user */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/remove/" + testUser.getId())
+                        .with(SecurityMockMvcRequestPostProcessors.user(friend.getUsername()).password(friend.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        /* "New user can't remove yourself from friends list" */
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL + "/friends/remove/" + friend.getId())
+                        .with(SecurityMockMvcRequestPostProcessors.user(friend.getUsername()).password(friend.getPassword())))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        friend = userService.findByUsername(username);
+        Assertions.assertFalse(friend.getFriends().contains(getTestUser()));
+        Assertions.assertFalse(getTestUser().getFriends().contains(friend));
     }
 
     @Test

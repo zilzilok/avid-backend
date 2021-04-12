@@ -79,6 +79,44 @@ public class UserFriendsController {
         return ResponseEntity.badRequest().body(String.format("User with username = %s doesn't exist.", username));
     }
 
+    @GetMapping("/remove/{id}")
+    public ResponseEntity<String> removeFriend(@PathVariable("id") Long id, Principal p) {
+        User user = userService.findByUsername(p.getName());
+        User friend = userService.findById(id);
+        if (friend != null) {
+            if (!user.getFriends().contains(friend)) {
+                return ResponseEntity.badRequest()
+                        .body(String.format("%s already removed user with id = %d.", p.getName(), id));
+            }
+
+            if (!user.getId().equals(id)) {
+                userService.removeFriend(user, friend);
+                return ResponseEntity.ok(String.format("The friend with id = %d removed successfully.", id));
+            }
+            return ResponseEntity.badRequest().body("User can't remove yourself from friends list.");
+        }
+        return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
+    }
+
+    @GetMapping("/remove")
+    public ResponseEntity<String> removeFriend(@RequestParam("username") String username, Principal p) {
+        User user = userService.findByUsername(p.getName());
+        User friend = userService.findByUsername(username);
+        if (friend != null) {
+            if (!user.getFriends().contains(friend)) {
+                return ResponseEntity.badRequest()
+                        .body(String.format("%s already added user with username = %s.", p.getName(), username));
+            }
+
+            if (!user.getUsername().equals(username)) {
+                userService.removeFriend(user, friend);
+                return ResponseEntity.ok(String.format("The friend with username = %s removed successfully.", username));
+            }
+            return ResponseEntity.badRequest().body("User can't remove yourself from friends list.");
+        }
+        return ResponseEntity.badRequest().body(String.format("User with username = %s doesn't exist.", username));
+    }
+
     @GetMapping("/games")
     public ResponseEntity<?> getFriendsGames(Principal p,
                                              @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,

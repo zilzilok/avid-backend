@@ -166,4 +166,9 @@ public class UserService implements UserDetailsService {
     public void addFriend(User user, User friend) {
         user.getFriends().add(friend);
     }
+
+    @Transactional
+    public void removeFriend(User user, User friend) {
+        user.getFriends().remove(friend);
+    }
 }
