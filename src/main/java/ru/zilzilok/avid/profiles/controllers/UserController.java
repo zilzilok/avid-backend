@@ -78,7 +78,11 @@ public class UserController {
             List<UserFriendDto> userFriends = new ArrayList<>();
             User user = userService.findByUsername(p.getName());
             users.forEach(friend ->
-                    userFriends.add(new UserFriendDto(friend, user.getFriends().contains(friend))));
+            {
+                if(!friend.equals(user)) {
+                    userFriends.add(new UserFriendDto(friend, user.getFriends().contains(friend)));
+                }
+            });
             return ResponseEntity.ok(userFriends);
         }
         return ResponseEntity.ok(users);
