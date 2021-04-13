@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user/friends")
+@RequestMapping("/user")
 public class UserFriendsController {
 
     private final UserService userService;
@@ -25,16 +25,28 @@ public class UserFriendsController {
         this.userGameService = userGameService;
     }
 
-    @GetMapping
+    @GetMapping("/friends")
     public ResponseEntity<?> getFriends(Principal p, @RequestParam(value = "startsWith", required = false) String startsWith) {
-        if(StringUtils.isNotBlank(startsWith)) {
+        if (StringUtils.isNotBlank(startsWith)) {
             return ResponseEntity.ok(userService.getAllFriends(p.getName(), startsWith));
         }
         User user = userService.findByUsername(p.getName());
         return ResponseEntity.ok(user.getFriends());
     }
 
-    @GetMapping("/add/{id}")
+    @GetMapping("/{id}/friends")
+    public ResponseEntity<?> getFriends(@PathVariable("id") Long id, @RequestParam(value = "startsWith", required = false) String startsWith) {
+        User user = userService.findById(id);
+        if (user != null) {
+            if (StringUtils.isNotBlank(startsWith)) {
+                return ResponseEntity.ok(userService.getAllFriends(user.getUsername(), startsWith));
+            }
+            return ResponseEntity.ok(user.getFriends());
+        }
+        return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
+    }
+
+    @GetMapping("/friends/add/{id}")
     public ResponseEntity<String> addFriend(@PathVariable("id") Long id, Principal p) {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findById(id);
@@ -56,7 +68,7 @@ public class UserFriendsController {
         return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
     }
 
-    @GetMapping("/add")
+    @GetMapping("/friends/add")
     public ResponseEntity<String> addFriend(@RequestParam("username") String username, Principal p) {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findByUsername(username);
@@ -79,7 +91,7 @@ public class UserFriendsController {
         return ResponseEntity.badRequest().body(String.format("User with username = %s doesn't exist.", username));
     }
 
-    @GetMapping("/remove/{id}")
+    @GetMapping("/friends/remove/{id}")
     public ResponseEntity<String> removeFriend(@PathVariable("id") Long id, Principal p) {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findById(id);
@@ -98,7 +110,7 @@ public class UserFriendsController {
         return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
     }
 
-    @GetMapping("/remove")
+    @GetMapping("/friends/remove")
     public ResponseEntity<String> removeFriend(@RequestParam("username") String username, Principal p) {
         User user = userService.findByUsername(p.getName());
         User friend = userService.findByUsername(username);
@@ -117,7 +129,7 @@ public class UserFriendsController {
         return ResponseEntity.badRequest().body(String.format("User with username = %s doesn't exist.", username));
     }
 
-    @GetMapping("/games")
+    @GetMapping("/friends/games")
     public ResponseEntity<?> getFriendsGames(Principal p,
                                              @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                                              @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
