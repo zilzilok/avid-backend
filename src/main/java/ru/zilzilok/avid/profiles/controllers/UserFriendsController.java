@@ -4,12 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.zilzilok.avid.profiles.models.dto.UserGameHasDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.models.other.UserGame;
 import ru.zilzilok.avid.profiles.services.UserGameService;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -133,7 +135,8 @@ public class UserFriendsController {
     public ResponseEntity<?> getFriendsGames(Principal p,
                                              @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                                              @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
-                                             @RequestParam(value = "sort", required = false) String sortType) {
+                                             @RequestParam(value = "sort", required = false) String sortType,
+                                             @RequestParam(value = "byUser", required = false, defaultValue = "false") boolean byUser) {
         if (limit < 0 || limit > 100) {
             limit = 10;
         }
@@ -143,8 +146,16 @@ public class UserFriendsController {
 
         User user = userService.findByUsername(p.getName());
 
-        List<UserGame> userFriendsGames = userGameService.findFriendsGames(user.getId(), limit, offset, sortType);
+        Iterable<UserGame> userFriendsGames = userGameService.addAverageRating(
+                userGameService.findFriendsGames(user.getId(), limit, offset, sortType));
 
-        return ResponseEntity.ok(userGameService.addAverageRating(userFriendsGames));
+        if (byUser) {
+            List<UserGameHasDto> userFriendsGamesHas = new ArrayList<>();
+            userFriendsGames.forEach(userGame -> userFriendsGamesHas.add(new UserGameHasDto(userGame,
+                    userGameService.findById(user.getId(), userGame.getId().getGameId()) != null)));
+            return ResponseEntity.ok(userFriendsGamesHas);
+        }
+
+        return ResponseEntity.ok((userFriendsGames));
     }
 }

@@ -5,12 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
+import ru.zilzilok.avid.profiles.models.dto.UserGameHasDto;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.models.other.UserGame;
 import ru.zilzilok.avid.profiles.services.UserGameService;
 import ru.zilzilok.avid.profiles.services.UserService;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -37,10 +40,21 @@ public class UserGamesController {
 
     @GetMapping("/{id}/games")
     public ResponseEntity<?> getUserGames(@PathVariable("id") Long id,
-                                          @RequestParam(value = "sort", required = false) String sortType) {
+                                          @RequestParam(value = "sort", required = false) String sortType,
+                                          @RequestParam(value = "byUser", required = false, defaultValue = "false") boolean byUser,
+                                          Principal p) {
         User user = userService.findById(id);
         if (user != null) {
-            return ResponseEntity.ok(userGameService.addAverageRating(userGameService.findByIdOrderedBy(user.getId(), sortType)));
+            Iterable<UserGame> userGames = userGameService.addAverageRating(userGameService.findByIdOrderedBy(user.getId(), sortType));
+            if (byUser) {
+                User me = userService.findByUsername(p.getName());
+                List<UserGameHasDto> userGamesHas = new ArrayList<>();
+                userGames.forEach(userGame ->
+                        userGamesHas.add(new UserGameHasDto(userGame,
+                                userGameService.findById(me.getId(), userGame.getId().getGameId()) != null)));
+                return ResponseEntity.ok(userGamesHas);
+            }
+            return ResponseEntity.ok(userGames);
         }
         return ResponseEntity.badRequest().body(String.format("User with id = %d doesn't exist.", id));
     }

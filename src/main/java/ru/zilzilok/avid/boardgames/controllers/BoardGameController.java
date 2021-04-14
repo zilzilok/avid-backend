@@ -6,8 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.zilzilok.avid.boardgames.models.dto.GameHasDto;
 import ru.zilzilok.avid.boardgames.models.dto.GameOwnerDto;
-import ru.zilzilok.avid.boardgames.models.dto.UserBoardGameDto;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.boardgames.services.GameService;
 import ru.zilzilok.avid.profiles.models.entities.User;
@@ -75,10 +75,10 @@ public class BoardGameController {
         }
 
         if (byUser) {
-            List<UserBoardGameDto> userBoardGames = new ArrayList<>();
+            List<GameHasDto> userBoardGames = new ArrayList<>();
             User user = userService.findByUsername(p.getName());
             boardGames.forEach(boardGame ->
-                    userBoardGames.add(new UserBoardGameDto(boardGame, userGameService.findById(user.getId(), boardGame.getId()) != null)));
+                    userBoardGames.add(new GameHasDto(boardGame, userGameService.findById(user.getId(), boardGame.getId()) != null)));
             return ResponseEntity.ok(userBoardGames);
         }
 

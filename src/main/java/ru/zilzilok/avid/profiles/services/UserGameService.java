@@ -8,6 +8,7 @@ import org.springframework.util.ObjectUtils;
 import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 import ru.zilzilok.avid.profiles.models.entities.User;
 import ru.zilzilok.avid.profiles.models.other.UserGame;
+import ru.zilzilok.avid.profiles.models.other.UserGameId;
 import ru.zilzilok.avid.profiles.repositories.UserGameRepository;
 import ru.zilzilok.avid.tools.OffsetBasedPageRequest;
 
@@ -28,6 +29,10 @@ public class UserGameService {
     @Transactional
     public UserGame findById(Long userId, Long gameId) {
         return userGameRepo.findByIdGameIdAndIdUserId(gameId, userId);
+    }
+
+    public UserGame findById(UserGameId id) {
+        return userGameRepo.findById(id).orElse(null);
     }
 
     @Transactional
