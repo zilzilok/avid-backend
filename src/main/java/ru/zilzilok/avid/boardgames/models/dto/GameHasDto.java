@@ -8,7 +8,7 @@ import ru.zilzilok.avid.boardgames.models.entities.BoardGame;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBoardGameDto {
+public class GameHasDto {
     BoardGame boardGame;
     boolean has;
 }
